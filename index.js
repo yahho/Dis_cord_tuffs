@@ -28,11 +28,7 @@ FS.readFile('emotes.json', 'utf-8', function (err, data) {
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 //トークンのアレイ
-const tokens = []
-tokens.push(FS.readFile('tokens.json', 'utf-8',function (err, data) {
-    if (err) throw err;
-    return JSON.parse(data)
-}))
+const tokens=JSON.parse(FS.readFileSync('tokens.json', 'utf-8'))
 
 //メッセージ送るだけ
 function repeater(ch, ArrayedMsg) {
