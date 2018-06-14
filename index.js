@@ -57,7 +57,7 @@ function amariplus(ArrayedMsg, conum) {
 function msgtrans(destch, msgs, transrep) {
     msgs[transrep - 1].unpin();
     posteddate=datefns(msgs[transrep - 1].createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp});
-    console.log(msgs[transrep-1].attachments.array()[0].url);
+    //console.log(msgs[transrep-1].attachments.array()[0].url);
     var atch
     if (msgs[transrep-1].attachments.array().length !=0) {
         atch=`\n\n【添付ファイルのリンク】:${msgs[transrep-1].attachments.array()[0].url}`;
@@ -242,12 +242,12 @@ client0.on('message', message => {
                 if (ArrayedCmd[1].indexOf('Enable') == 0) {
                     //TODO:クライアントのイベントから拾うように書き直す
                     let transdestch = message.mentions.channels.array()[message.mentions.channels.array().length - 1];
-                    var msgcoll = message.channel.createMessageCollector(function (msg) {
+                    var pinmsgcoll = message.channel.createMessageCollector(function (msg) {
                         //ここのフィルタは今のところは特に意味をなしていない。（）
                         return msg.type == 'DEFAULT';
                     });
-                    msgcoll.on('collect', obsmsg => {
-                        obsmsg.createReactionCollector(function (reaction) {
+                    pinmsgcoll.on('collect', obsmsg => {
+                        let pinreactcoll=obsmsg.createReactionCollector(function (reaction) {
                             return reaction.emoji.name === '📌';
                         }).on('collect', react => {
                             let transmsgs = [];
@@ -257,6 +257,7 @@ client0.on('message', message => {
                             //console.log(datefns(react.message.createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp}));
                             msgtrans(transdestch, transmsgs, 1);
                             //message.embeds[0].type
+                            pinreactcoll.stop();
                         })
                     })
 
