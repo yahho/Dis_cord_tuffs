@@ -57,8 +57,12 @@ function amariplus(ArrayedMsg, conum) {
 function msgtrans(destch, msgs, transrep) {
     msgs[transrep - 1].unpin();
     posteddate=datefns(msgs[transrep - 1].createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp});
-    console.log(`メッセージエンベッド：${msgs[transrep-1].embeds}`)
-    destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}\n\n`)
+    console.log(msgs[transrep-1].attachments.array()[0].url);
+    var atch
+    if (msgs[transrep-1].attachments.array().length !=0) {
+        atch=`\n\n【添付ファイルのリンク】:${msgs[transrep-1].attachments.array()[0].url}`;
+    }else{atch=``;}
+    destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}${atch}`)
 }
 
 function loginer() {
