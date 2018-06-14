@@ -57,7 +57,8 @@ function amariplus(ArrayedMsg, conum) {
 function msgtrans(destch, msgs, transrep) {
     msgs[transrep - 1].unpin();
     posteddate=datefns(msgs[transrep - 1].createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp});
-    destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`)
+    console.log(`メッセージエンベッド：${msgs[transrep-1].embeds}`)
+    destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}\n\n`)
 }
 
 function loginer() {
@@ -235,6 +236,7 @@ client0.on('message', message => {
                     })
             } else if (message.content.indexOf('PinTransmitter') == 7) {
                 if (ArrayedCmd[1].indexOf('Enable') == 0) {
+                    //TODO:クライアントのイベントから拾うように書き直す
                     let transdestch = message.mentions.channels.array()[message.mentions.channels.array().length - 1];
                     var msgcoll = message.channel.createMessageCollector(function (msg) {
                         //ここのフィルタは今のところは特に意味をなしていない。（）
@@ -250,6 +252,7 @@ client0.on('message', message => {
                             //date-fnsのformatとその日本語ロケールを使って実現するためにいろいろ試した痕跡です。
                             //console.log(datefns(react.message.createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp}));
                             msgtrans(transdestch, transmsgs, 1);
+                            //message.embeds[0].type
                         })
                     })
 
