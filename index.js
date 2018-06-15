@@ -61,16 +61,22 @@ function msgtrans(destch, msgs, transrep) {
         console.log(`すでに転送済みのメッセージ。メッセージID:${msgs[transrep - 1].id}`);
     }else{
         let msgid = msgs[transrep - 1].id;
+        //↓の奴if挟んだほうがいいだろうか？
         msgs[transrep - 1].unpin();
+        //転送するメッセージの投稿日時を取得してdate-fnsで日本語にする
         posteddate = datefns(msgs[transrep - 1].createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp});
         //console.log(msgs[transrep-1].attachments.array()[0].url);
         if (msgs[transrep-1].attachments.array().length != 0) {
+            //ファイルがくっついてればこっち
             var atch=msgs[transrep-1].attachments.array()[0].url;
+            //Attachmentにはファイルのパス、URL、またはバッファを投げる。
+            //contentの後にAttachmentやRichEmbedをブチ込むと一緒に投稿してくれる。
             destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`,new Discord.Attachment(atch)).then(function(){
                 pinnedmsgids.push(msgid);
                 FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
             })
         }else{
+            //なんもくっついてなければこっち
             destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`).then(function(){
                 pinnedmsgids.push(msgid);
                 FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
@@ -79,9 +85,11 @@ function msgtrans(destch, msgs, transrep) {
     }
 }
 
+//📌転送用の配列達
 var pinobservechs = [];
 var pindestch = [];
 
+//ログイン用関数
 function loginer() {
     client0.login(tokens[0]);
     client1.login(tokens[1]);
@@ -128,7 +136,7 @@ client9.on('ready', () => {
     console.log('Am I ready?');
 });
 
-// イベントハンドラ
+// メッセージ投稿が確認されたとき
 client0.on('message', message => {
     if (message.type == 'DEFAULT') {
         //スパイシーにするコマンド認識
@@ -279,12 +287,14 @@ client0.on('message', message => {
                     })
 
                 }else if (ArrayedCmd[1].indexOf('Guild')==0) {
+                    //このコマンドで、コマンドメッセージを投稿したギルド全体のテキストチャンネルにて
+                    //ボット起動後に投稿されたメッセージに対してつけられた📌リアクションで
+                    //指定したチャンネルに転送するように設定する。
                     pinobservechs = message.guild.channels.filterArray(function (guildch){
-                        //
+                        //ここでテキストチャンネルだけ取り出す
                         if (guildch.type == "text") {return true;} else {return false;}
                     })
                     pindestch.push({channel:message.mentions.channels.last(),guild:message.mentions.channels.last().guild});
-                    console.log(pindestch);
                 }
             }
         }
@@ -299,9 +309,11 @@ client0.on('message', message => {
 }).on('messageReactionAdd', react => {
     if (react.emoji.name === '📌'){
         if (pinobservechs.includes(react.message.channel)) {
+            //対象のチャンネルかどうかを確認
             if (pindestch.filter(function (chset){
                 return chset.guild === react.message.guild;
             }).length != 0){
+                //送り先のチャンネルの確認
                 msgtrans(pindestch.filter(function (chset){
                     return chset.guild === react.message.guild                    
                 })[0].channel, [react.message], 1);
