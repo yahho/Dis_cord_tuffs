@@ -29,6 +29,8 @@ FS.readFile('emotes.json', 'utf-8', function (err, data) {
 // The token of your bot - https://discordapp.com/developers/applications/me
 //トークンのアレイ
 const tokens=JSON.parse(FS.readFileSync('tokens.json', 'utf-8'))
+//転送済みメッセージのIDのアレイを格納する奇妙な拡張子のファイルを読み込む
+var pinnedmsgids=JSON.parse(FS.readFileSync("pinned.json","utf-8"));
 
 //メッセージ送るだけ
 function repeater(ch, ArrayedMsg) {
@@ -55,15 +57,30 @@ function amariplus(ArrayedMsg, conum) {
 
 //メッセージ転送用の関数
 function msgtrans(destch, msgs, transrep) {
-    msgs[transrep - 1].unpin();
-    posteddate=datefns(msgs[transrep - 1].createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp});
-    //console.log(msgs[transrep-1].attachments.array()[0].url);
-    var atch
-    if (msgs[transrep-1].attachments.array().length !=0) {
-        atch=`\n\n【添付ファイルのリンク】:${msgs[transrep-1].attachments.array()[0].url}`;
-    }else{atch=``;}
-    destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}${atch}`)
+    if (pinnedmsgids.includes(msgs[transrep - 1].id)){
+        console.log(`すでに転送済みのメッセージ。メッセージID:${msgs[transrep - 1].id}`);
+    }else{
+        let msgid = msgs[transrep - 1].id;
+        msgs[transrep - 1].unpin();
+        posteddate = datefns(msgs[transrep - 1].createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp});
+        //console.log(msgs[transrep-1].attachments.array()[0].url);
+        if (msgs[transrep-1].attachments.array().length != 0) {
+            var atch=msgs[transrep-1].attachments.array()[0].url;
+            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`,new Discord.Attachment(atch)).then(function(){
+                pinnedmsgids.push(msgid);
+                FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
+            })
+        }else{
+            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`).then(function(){
+                pinnedmsgids.push(msgid);
+                FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
+            })
+        }
+    }
 }
+
+var pinobservechs = [];
+var pindestch = [];
 
 function loginer() {
     client0.login(tokens[0]);
@@ -249,7 +266,7 @@ client0.on('message', message => {
                     pinmsgcoll.on('collect', obsmsg => {
                         let pinreactcoll=obsmsg.createReactionCollector(function (reaction) {
                             return reaction.emoji.name === '📌';
-                        }).on('collect', react => {
+                        }).once('collect', react => {
                             let transmsgs = [];
                             transmsgs.push(react.message);
                             //このコードはDate.prototype.toLocaleString()だと自分の環境では日本語表記にできなかったので
@@ -261,6 +278,13 @@ client0.on('message', message => {
                         })
                     })
 
+                }else if (ArrayedCmd[1].indexOf('Guild')==0) {
+                    pinobservechs = message.guild.channels.filterArray(function (guildch){
+                        //
+                        if (guildch.type == "text") {return true;} else {return false;}
+                    })
+                    pindestch.push({channel:message.mentions.channels.last(),guild:message.mentions.channels.last().guild});
+                    console.log(pindestch);
                 }
             }
         }
@@ -272,7 +296,20 @@ client0.on('message', message => {
     //if (!channel) return;
     // Send the message, mentioning the member
     //channel.send(`Welcome to the server, ${member}`);
+}).on('messageReactionAdd', react => {
+    if (react.emoji.name === '📌'){
+        if (pinobservechs.includes(react.message.channel)) {
+            if (pindestch.filter(function (chset){
+                return chset.guild === react.message.guild;
+            }).length != 0){
+                msgtrans(pindestch.filter(function (chset){
+                    return chset.guild === react.message.guild                    
+                })[0].channel, [react.message], 1);
+            }
+        }
+    }
 });
+
 //こっから先はただおんなじコードがそれぞれ記述されているだけ。違うのはディレイ用の定数くらいなもん
 client1.on('message', message => {
     if (message.type == 'DEFAULT') {
