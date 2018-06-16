@@ -6,6 +6,9 @@
 const Discord = require('discord.js')
 const datefns = require('date-fns/format')
 const datefnsjp = require('date-fns/locale/ja')
+
+const distuff_util = require('./util/utils')
+
 // Create an instance of a Discord client
 const client0 = new Discord.Client();
 const client1 = new Discord.Client();
@@ -30,64 +33,11 @@ FS.readFile('emotes.json', 'utf-8', function (err, data) {
 //トークンのアレイ
 const tokens=JSON.parse(FS.readFileSync('tokens.json', 'utf-8'))
 //転送済みメッセージのIDのアレイを格納する奇妙な拡張子のファイルを読み込む
-var pinnedmsgids=JSON.parse(FS.readFileSync("pinned.json","utf-8"));
-
-//メッセージ送るだけ
-function repeater(ch, ArrayedMsg) {
-    ch.send(ArrayedMsg[1]);
-}
-
-//上の関数repeater(ch, ArrayedMsg)をリピートさせる根幹部分
-function looper(ch, ArrayedMsg, reNum) {
-    for (let currentNum = 0; currentNum < reNum; ++currentNum) {
-        //ここで1足して処理してないとｋ送信から時間が短すぎて途中で制限に引っかかると思う
-        setTimeout(repeater, 1300 * (currentNum + 1), ch, ArrayedMsg);
-    }
-}
-
-//割った余りを基に不足分をそれぞれ追加する数値を作るための関数
-function amariplus(ArrayedMsg, conum) {
-    let amari = ArrayedMsg[0].replace('/Re: ', '') % 10;
-    if (amari >= conum) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-//メッセージ転送用の関数
-function msgtrans(destch, msgs, transrep) {
-    if (pinnedmsgids.includes(msgs[transrep - 1].id)){
-        console.log(`すでに転送済みのメッセージ。メッセージID:${msgs[transrep - 1].id}`);
-    }else{
-        let msgid = msgs[transrep - 1].id;
-        //↓の奴if挟んだほうがいいだろうか？
-        msgs[transrep - 1].unpin();
-        //転送するメッセージの投稿日時を取得してdate-fnsで日本語にする
-        posteddate = datefns(msgs[transrep - 1].createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp});
-        //console.log(msgs[transrep-1].attachments.array()[0].url);
-        if (msgs[transrep-1].attachments.array().length != 0) {
-            //ファイルがくっついてればこっち
-            var atch=msgs[transrep-1].attachments.array()[0].url;
-            //Attachmentにはファイルのパス、URL、またはバッファを投げる。
-            //contentの後にAttachmentやRichEmbedをブチ込むと一緒に投稿してくれる。
-            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`,new Discord.Attachment(atch)).then(function(){
-                pinnedmsgids.push(msgid);
-                FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
-            })
-        }else{
-            //なんもくっついてなければこっち
-            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`).then(function(){
-                pinnedmsgids.push(msgid);
-                FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
-            })
-        }
-    }
-}
+distuff_util.pinnedmsgids=JSON.parse(FS.readFileSync("pinned.json","utf-8"));
 
 //📌転送用の配列達
-var pinobservechs = [];
-var pindestch = [];
+var pinobservechs = distuff_util.PinObserveChs;
+var pindestch = distuff_util.PinDestCh;
 
 //ログイン用関数
 function loginer() {
@@ -157,7 +107,7 @@ client0.on('message', message => {
 
             //準備完了報告&処理実行
             message.channel.send('ｋ');
-            setTimeout(looper, 1000, ch, ArrayedMsg, reNum);
+            setTimeout(distuff_util.looper, 1000, ch, ArrayedMsg, reNum);
         } else if (message.content.indexOf('/Func: ') == 0) {
             //コマンド認識
             let ArrayedCmd = message.content.split('.')
@@ -229,15 +179,34 @@ client0.on('message', message => {
                         //絵文字があるか確認
                         let emoName = emostore_json.filter(function (value) {
                             return value.id == emoId;
-                        })[0].name;
-                        message.channel.send(`<:${emoName}:${emoId}>`);
+                        })[0].name,
+                            emoIsanim = emostore_json.filter(function (value) {
+                                return value.id == emoId;
+                            })[0].isanim;
+                        let anim="";
+                        if(emoIsanim){anim = "a"}else{anim = ""}
+                        message.channel.send(`<${anim}:${emoName}:${emoId}>`);
                     }
                 } else if (ArrayedCmd[1].indexOf('add') == 0) {
                     //絵文字の追加
-                    let newemoId = ArrayedCmd[1].split(' ')[1].split(':')[1],
-                        newemoName = ArrayedCmd[1].split(' ')[1].split(':')[0];
-                    message.channel.send(`<:${newemoName}:${newemoId}>を追加しています。。。`);
-                    emostore_json.push({ name: newemoName, id: newemoId });
+                    let newemoIsanim,
+                        newemoId,
+                        newemoName;
+                    let str=ArrayedCmd[1].slice(4);
+                    if(str.startsWith('a')){
+                        newemoIsanim=true;
+                        str=str.slice(2);
+                    }else{
+                        newemoIsanim=false;
+                        str=str.slice(1);
+                    }
+                    newemoName=str.split(':')[0];
+                    newemoId=str.split(':')[1];
+                    let anim="";
+                    if(newemoIsanim){anim = "a"}else{anim = ""}
+                    message.channel.send(`<${anim}:${newemoName}:${newemoId}>を追加しています。。。`);
+                    let emojic = new distuff_util.EmojiCache(newemoName, newemoId, newemoIsanim);
+                    emostore_json.push(emojic.toObject());
                     FS.writeFile('emotes.json', JSON.stringify(emostore_json), 'utf-8', function (err) {
                         //非同期な書き込み
                         if (err) { console.log(err); }
@@ -259,7 +228,7 @@ client0.on('message', message => {
                     .then(msgsb => {
                         let msgs = msgsb.array();
                         for (let transrep = 1; transrep <= msgs.length; transrep++) {
-                            setTimeout(msgtrans, 3000 * transrep, destch, msgs, transrep);
+                            setTimeout(distuff_util.msgtrans, 3000 * transrep, destch, msgs, transrep);
                         }
                         message.channel.send('移行処理発行を完了しました。しばらくお待ち下さい...');
                     })
@@ -280,7 +249,7 @@ client0.on('message', message => {
                             //このコードはDate.prototype.toLocaleString()だと自分の環境では日本語表記にできなかったので
                             //date-fnsのformatとその日本語ロケールを使って実現するためにいろいろ試した痕跡です。
                             //console.log(datefns(react.message.createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp}));
-                            msgtrans(transdestch, transmsgs, 1);
+                            distuff_util.msgtrans(transdestch, transmsgs, 1);
                             //message.embeds[0].type
                             pinreactcoll.stop();
                         })
@@ -314,7 +283,7 @@ client0.on('message', message => {
                 return chset.guild === react.message.guild;
             }).length != 0){
                 //送り先のチャンネルの確認
-                msgtrans(pindestch.filter(function (chset){
+                distuff_util.msgtrans(pindestch.filter(function (chset){
                     return chset.guild === react.message.guild                    
                 })[0].channel, [react.message], 1);
             }
@@ -335,8 +304,8 @@ client1.on('message', message => {
             //return 0;
             //}
             //}
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, 1);
-            console.log(amariplus(ArrayedMsg, 1));
+            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 1);
+            console.log(distuff_util.amariplus(ArrayedMsg, 1));
             let ch;
             if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
                 let chs = message.mentions.channels.array();
@@ -347,7 +316,7 @@ client1.on('message', message => {
             }
 
             message.channel.send('ｋ');
-            setTimeout(looper, 1200, ch, ArrayedMsg, reNum);
+            setTimeout(distuff_util.looper, 1200, ch, ArrayedMsg, reNum);
         }
     }
     // Send the message to a designated channel on a server:
@@ -361,7 +330,7 @@ client2.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
             let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, 2);
+            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 2);
             let ch;
             if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
                 let chs = message.mentions.channels.array();
@@ -372,7 +341,7 @@ client2.on('message', message => {
             }
 
             message.channel.send('ｋ');
-            setTimeout(looper, 1400, ch, ArrayedMsg, reNum);
+            setTimeout(distuff_util.looper, 1400, ch, ArrayedMsg, reNum);
         }
     }
     // Send the message to a designated channel on a server:
@@ -386,7 +355,7 @@ client3.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
             let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, 3);
+            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 3);
             let ch;
             if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
                 let chs = message.mentions.channels.array();
@@ -397,7 +366,7 @@ client3.on('message', message => {
             }
 
             message.channel.send('ｋ');
-            setTimeout(looper, 1600, ch, ArrayedMsg, reNum);
+            setTimeout(distuff_util.looper, 1600, ch, ArrayedMsg, reNum);
         }
     }
     // Send the message to a designated channel on a server:
@@ -411,7 +380,7 @@ client4.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
             let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, 4);
+            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 4);
             let ch;
             if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
                 let chs = message.mentions.channels.array();
@@ -422,7 +391,7 @@ client4.on('message', message => {
             }
 
             message.channel.send('ｋ');
-            setTimeout(looper, 1800, ch, ArrayedMsg, reNum);
+            setTimeout(distuff_util.looper, 1800, ch, ArrayedMsg, reNum);
         }
     }
     // Send the message to a designated channel on a server:
@@ -436,7 +405,7 @@ client5.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
             let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, 5);
+            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 5);
             let ch;
             if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
                 let chs = message.mentions.channels.array();
@@ -447,7 +416,7 @@ client5.on('message', message => {
             }
 
             message.channel.send('ｋ');
-            setTimeout(looper, 1100, ch, ArrayedMsg, reNum);
+            setTimeout(distuff_util.looper, 1100, ch, ArrayedMsg, reNum);
         }
     }
     // Send the message to a designated channel on a server:
@@ -461,7 +430,7 @@ client6.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
             let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, 6);
+            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 6);
             let ch;
             if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
                 let chs = message.mentions.channels.array();
@@ -472,7 +441,7 @@ client6.on('message', message => {
             }
 
             message.channel.send('ｋ');
-            setTimeout(looper, 1300, ch, ArrayedMsg, reNum);
+            setTimeout(distuff_util.looper, 1300, ch, ArrayedMsg, reNum);
         }
     }
     // Send the message to a designated channel on a server:
@@ -486,7 +455,7 @@ client7.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
             let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, 7);
+            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 7);
             let ch;
             if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
                 let chs = message.mentions.channels.array();
@@ -497,7 +466,7 @@ client7.on('message', message => {
             }
 
             message.channel.send('ｋ');
-            setTimeout(looper, 1500, ch, ArrayedMsg, reNum);
+            setTimeout(distuff_util.looper, 1500, ch, ArrayedMsg, reNum);
         }
     }
     // Send the message to a designated channel on a server:
@@ -511,7 +480,7 @@ client8.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
             let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, 8);
+            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 8);
             let ch;
             if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
                 let chs = message.mentions.channels.array();
@@ -522,7 +491,7 @@ client8.on('message', message => {
             }
 
             message.channel.send('ｋ');
-            setTimeout(looper, 1700, ch, ArrayedMsg, reNum);
+            setTimeout(distuff_util.looper, 1700, ch, ArrayedMsg, reNum);
         }
     }
     // Send the message to a designated channel on a server:
@@ -536,7 +505,7 @@ client9.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
             let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, 9);
+            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 9);
             let ch;
             if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
                 let chs = message.mentions.channels.array();
@@ -547,7 +516,7 @@ client9.on('message', message => {
             }
 
             message.channel.send('ｋ');
-            setTimeout(looper, 1900, ch, ArrayedMsg, reNum);
+            setTimeout(distuff_util.looper, 1900, ch, ArrayedMsg, reNum);
         }
     }
     // Send the message to a designated channel on a server:
