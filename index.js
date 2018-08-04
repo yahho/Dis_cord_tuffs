@@ -4,8 +4,6 @@
 
 // Import the discord.js module
 const Discord = require('discord.js')
-const datefns = require('date-fns/format')
-const datefnsjp = require('date-fns/locale/ja')
 
 const distuff_util = require('./util/utils')
 
@@ -22,11 +20,11 @@ const client8 = new Discord.Client();
 const client9 = new Discord.Client();
 
 //奇妙な拡張子のファイルパーサー(emotesという名前で奇妙な拡張子のファイル)
-var emostore_json;
+var emostore_json = new distuff_util.EmojiStorage();
 var FS = require('fs');
 FS.readFile('emotes.json', 'utf-8', function (err, data) {
     if (err) throw err;
-    emostore_json = JSON.parse(data);
+    emostore_json.fromJSONArray(JSON.parse(data));
 })
 
 // The token of your bot - https://discordapp.com/developers/applications/me
@@ -173,10 +171,10 @@ client0.on('message', message => {
                 if (ArrayedCmd[1].indexOf('post') == 0) {
                     //絵文字投稿コマンド
                     let emoId = ArrayedCmd[1].split(' ')[1];
+                    //絵文字があるか確認
                     if (emostore_json.some(function (value) {
                         return value.id == emoId;
                     })) {
-                        //絵文字があるか確認
                         let emoName = emostore_json.filter(function (value) {
                             return value.id == emoId;
                         })[0].name,

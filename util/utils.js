@@ -4,6 +4,9 @@ const datefns = require('date-fns/format')
 const datefnsjp = require('date-fns/locale/ja')
 
 var pinnedmsgids=JSON.parse(FS.readFileSync('pinned.json','utf-8'));
+function typecheck(chkobj){
+    return Object.prototype.toString.call(chkobj).slice(8, -1).toLowerCase()
+}
 
 //メッセージ送るだけ
 function repeater(ch, ArrayedMsg) {
@@ -44,7 +47,7 @@ function msgtrans(destch, msgs, transrep) {
             var atch=msgs[transrep-1].attachments.array()[0].url;
             //Attachmentにはファイルのパス、URL、またはバッファを投げる。
             //contentの後にAttachmentやRichEmbedをブチ込むと一緒に投稿してくれる。
-            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`,new Discord.Attachment(atch)).then(function(){
+            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。\n【ジャンプURL】:\n内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`,new Discord.Attachment(atch)).then(function(){
                 pinnedmsgids.push(msgid);
                 FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
             })
@@ -63,13 +66,15 @@ var PinDestCh = [];
 
 class EmojiCache{
     constructor(name, id, isanim){
-        if(name){this.name=name}
-        if(id){this.id=id}
-        if(isanim){this.isanim=isanim}
+        if(name){this.name=name}else{this.name=null}
+        if(id){this.id=id}else{this.id=null}
+        if(isanim){this.isanim=isanim}else{this.isanim=null}
     }
 
     fromString(str){
         if(Object.prototype.toString.call(str)=='[Object String]'){
+            if(str.startsWith("<")==false||str.endsWith(">")==false){throw new SyntaxError(`絵文字の構文が正しくありません。絵文字は<>で囲まれている必要があります。\n問題が発生した文字列:${str}`)}
+            if(str.split(":").length!=3){throw new SyntaxError(`絵文字の構文が正しくありません。絵文字には2つのコロンが存在するはずです。\n問題が発生した文字列:${str}`)}
             str.replace('<','');
             str.replace('>','');
             if(str.startsWith('a')){
@@ -93,6 +98,56 @@ class EmojiCache{
     toObject(){
         return {name:this.name, id:this.id, isanim:this.isanim}
     }
+
+    toJSONString(){
+        this.chkthis();
+        let TorFstr;
+        if(this.isanim){TorFstr="true"}else{TorFstr="false"}
+        return `{"name":"${this.name}","id":"${this.id}","isanim":"${TorFstr}"}`
+    }
+
+    chkthis(){
+        if(typecheck(this.name)!="string"){throw new TypeError(`絵文字の名称が文字列ではありません。識別された型：${typecheck(this.name)}`)}
+        if(typecheck(this.id)!="string"){throw new TypeError(`絵文字のIDが文字列ではありません。識別された型：${typecheck(this.id)}`)}
+        if(typecheck(this.isanim)!="boolean"){throw new TypeError(`絵文字のアニメーションの有無が判別できません。識別された型：${typecheck(this.isanim)}`)}
+
+    }
 }
-module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids,EmojiCache}
+
+class EmojiStorage extends Array{
+    constructor(array){
+        if(typecheck(array)=='array'){
+            super();
+            this.concat(array)
+            return this
+        }else {
+            super();
+            return this
+        }
+    }
+
+    toJSONString(){
+        const BeginEnd = ["[","]"];
+        let retstr = BeginEnd[0];
+        if (this.length != 0){
+            for(let i=0;i<=this.length-1;i++){
+                retstr=retstr+this[i].toJSONString();
+                retstr=retstr+","
+            }
+            retstr = retstr.slice(0,-1);
+        }
+        retstr=retstr+BeginEnd[1];
+        return retstr;
+    }
+
+    fromJSONArray(array){
+        if(typecheck(array)!='array'){throw new TypeError(`入力は配列でなければなりません。判定された型: ${typecheck(array)}`)}else{
+            array.forEach(consemo => {
+                this.push(new EmojiCache(consemo.name, consemo.id, consemo.isanim))
+            },this);
+            return this;
+        }
+    }
+}
+module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, typecheck}
 

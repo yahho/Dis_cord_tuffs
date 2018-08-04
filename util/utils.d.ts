@@ -2,15 +2,6 @@
 import Discord = require('discord.js');
 
 declare module './utils'{
-    type EmojiStorageObj = {
-        name:string,
-        id:string|number,
-        isanim:boolean
-    };
-    type DestinationChannelSet = {
-        channel:Discord.TextChannel,
-        guild:Discord.Guild
-    };
      /**
      *メッセージの送信を行います。
      *それだけです。
@@ -43,21 +34,28 @@ declare module './utils'{
      * @param {number} transrep　参照用の番号です。1から始まります。
      */
     function msgtrans(destch:Discord.TextChannel, msgs:Array<Discord.Message>, transrep:number):void;
+    /**
+     *渡されたオブジェクトの型を確認します。
+     *
+     * @param {*} chkobj
+     * @returns {string}
+     */
+    function typecheck(chkobj):string;
 
     var PinObserveChs:Array<Discord.TextChannel>;
     var PinDestCh:Array<{channel:Discord.TextChannel,guild:Discord.Guild}>;
-    var pinnedmsgids:Array<number|string>;
-/**
- *絵文字をDistuffBots内でキャッシュする際に扱われるオブジェクトのクラスです。
- *ボットがアクセスできないギルドに属した絵文字もキャッシュできますが、使用することはできません。
- *
- * @class EmojiCache
- */
-class EmojiCache{
+    var pinnedmsgids:Array<string>;
+    /**
+     *絵文字をDistuffBots内でキャッシュする際に扱われるオブジェクトのクラスです。
+     *ボットがアクセスできないギルドに属した絵文字もキャッシュできますが、使用することはできません。
+     *
+     * @class EmojiCache
+     */
+    class EmojiCache{
         public name:string;
-        public id:string|number;
+        public id:string;
         public isanim:boolean;
-        constructor(name?:string, id?:string|number, isanim?:boolean)
+        constructor(name?:string, id?:string, isanim?:boolean)
         /**
          *これを使うと絵文字の実際の文字列（そのまま投稿すると絵文字に変換される文字列）からEmojiCacheに変換できます。
          *
@@ -76,10 +74,44 @@ class EmojiCache{
         /**
          *これを使うとEmojiCacheからオブジェクトに変換できます。
          *
-         * @returns {({name:string, id:string|number, isanim:boolean})}
+         * @returns {({name:string, id:string, isanim:boolean})}
          * @memberof EmojiCache
          */
-        public toObject():{name:string, id:string|number, isanim:boolean};
+        public toObject():{name:string, id:string, isanim:boolean};
+        /**
+         *JSON文字列に変換します。
+         *
+         * @returns {string}
+         * @memberof EmojiCache
+         */
+        public toJSONString():string;
+        /**
+         *整合性確認的な関数です。
+         *
+         * @memberof EmojiCache
+         */
+        public chkthis():void;
+    }
+    /**
+     *ただ囲んだだけです。EmojiCacheしか入れてはならぬ。
+     *
+     * @class EmojiStrage
+     * @extends {Array<EmojiCache>}
+     * @template EmojiCache
+     */
+    class EmojiStorage<EmojiCache> extends Array<EmojiCache>{
+        constructor(array:Array<EmojiCache>)
+        /**
+         *JSON文字列に変換します。
+         *
+         * @returns {string}
+         * @memberof EmojiStorage
+         */
+        public toJSONString():string;
+
+        public fromJSONArray(array:Array<object>):this;
+
+        public first():EmojiCache;
     }
 }
 
