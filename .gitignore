@@ -95,8 +95,8 @@ $RECYCLE.BIN/
 # End of https://www.gitignore.io/api/visualstudiocode,windows,node
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
-tokens.json
+#tokens.json
 package-lock.json
 emotes - コピー.json
-emotes.json
-pinned.json
+#emotes.json
+#pinned.json
