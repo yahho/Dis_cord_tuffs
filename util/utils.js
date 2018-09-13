@@ -2,6 +2,7 @@ const FS = require('fs');
 const Discord = require('discord.js');
 const datefns = require('date-fns/format')
 const datefnsjp = require('date-fns/locale/ja')
+const offsettedDate = require('date-with-offset')
 
 var pinnedmsgids=JSON.parse(FS.readFileSync('pinned.json','utf-8'));
 function typecheck(chkobj){
@@ -84,9 +85,10 @@ function repeatcom(message, botid){
 }
 
 function WATIIN(){
-    const today = new Date()
+    const today = new offsettedDate(540)
+    let date = today.getDate()
     let ahour = today.getHours()>=3 ? today.getHours()>6 ? today.getHours()>9 ? today.getHours()>12 ? today.getHours()>15 ? today.getHours()>18 ? today.getHours()>22 ? "深夜":"夜":"午後":"昼頃":"午前":"朝":"早朝":"未明"
-    return `${today.getDay}日${ahour}`
+    return `${date}日${ahour}`
 }
 
 class EmojiCache{
