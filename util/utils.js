@@ -70,7 +70,10 @@ function repeatcom(message, botid){
     let ch;
     if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
         let chs = message.mentions.channels.array();
-        ch = chs[chs.length - 1];
+        let dchs = []
+        chs.forEach(function(chent){if(chent.id == Number(ArrayedMsg[2].replace("<#", "").replace(">", ""))){dchs.push(chent)}})
+        if(dchs.length==0){ch = message.channel}
+        ch = dchs[chs.length - 1];
         //console.log(chs);
     } else {
         ch = message.channel;
