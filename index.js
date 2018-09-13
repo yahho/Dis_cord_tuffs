@@ -265,7 +265,8 @@ client0.on('message', message => {
                 }
             } else if (message.content.indexOf('DedNewsGen') == 7) {
                 let Arrayedlns = message.content.split(/\r\n|\r|\n/g)
-                let Defaultstrs = ["に埋もれてdedしている", "が発見された。"].reverse().push(`${distuff_util.WATIIN()}、果実都某所で、`).reverse()
+                let Defaultstrs = ["に埋もれてdedしている", "が発見された。"].reverse().push(`${distuff_util.WATIIN()}、果実都某所で、`)
+                Defaultstrs.reverse()
                 if(Arrayedlns.length >=3){
                     let burything=""
                     let buriedperson=""
