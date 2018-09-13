@@ -272,16 +272,16 @@ client0.on('message', message => {
                     let burything=""
                     let buriedperson=""
                     if(Arrayedlns[1].length>0 && Arrayedlns[2].length>0){
-                        [_, burything, buriedperson] = Arrayedlns
-                        let lns=[]
-                        let lastlnpt=[]
+                        [_, burything, buriedperson] = Arrayedlns;
+                        let lns=[];
+                        let lastlnpt=[];
                         for(let r1=1;r1==3;r1++){
-                            let ln =[]
+                            let ln =[];
                             for(let r2=1;r2==7;r2++){
-                                ln.push(burything)
+                                ln.push(burything);
                             }
-                            lns.push(ln.join(""))
-                            lastlnpt.push(burything)
+                            lns.push(ln.join(""));
+                            lastlnpt.push(burything);
                         }
                         lns.push(lastlnpt.join("")+buriedperson+lastlnpt.join(""))
                         let returnedlns= [Defaultstrs[0]+burything+Defaultstrs[1]+buriedperson+Defaultstrs[2]].concat(lns).join('\n')
