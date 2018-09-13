@@ -273,11 +273,13 @@ client0.on('message', message => {
                     let buriedperson=""
                     if(Arrayedlns[1].length>0 && Arrayedlns[2].length>0){
                         [_, burything, buriedperson] = Arrayedlns;
+                        burything.endsWith(" ") ? burything=burything : burything=burything+" "
+                        buriedperson.endsWith(" ") ? buriedperson=buriedperson : buriedperson=buriedperson+" "
                         let lns=[];
                         let lastlnpt=[];
-                        for(let r1=1;r1==3;r1++){
+                        for (var r1=0;r1!=3;r1++) {
                             let ln =[];
-                            for(let r2=1;r2==7;r2++){
+                            for (var r2=0;r2!=7;r2++) {
                                 ln.push(burything);
                             }
                             lns.push(ln.join(""));
