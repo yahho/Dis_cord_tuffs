@@ -52,6 +52,14 @@ declare module './utils'{
      * @param {Number} botid
      */
     function repeatcom(message:Discord.Message, botid:Number):void;
+    
+    /**
+     *〇〇日△△の形で時刻を出力します。
+     *例：30日夜, 3日昼頃, etc...
+     *
+     * @returns {string}
+     */
+    function WATIIN():string;
     /**
      *絵文字をDistuffBots内でキャッシュする際に扱われるオブジェクトのクラスです。
      *ボットがアクセスできないギルドに属した絵文字もキャッシュできますが、使用することはできません。

@@ -263,6 +263,27 @@ client0.on('message', message => {
                     })
                     pindestch.push({channel:message.mentions.channels.last(),guild:message.mentions.channels.last().guild});
                 }
+            } else if (message.content.indexOf('DedNewsGen') == 7) {
+                let Arrayedlns = message.content.split(/\r\n|\r|\n/g)
+                let Defaultstrs = ["に埋もれてdedしている", "が発見された。"].reverse().push(`${distuff_util.WATIIN()}、果実都某所で、`).reverse()
+                if(Arrayedlns.length >=3){
+                    let burything=""
+                    let buriedperson=""
+                    if(Arrayedlns[1].length>0 && Arrayedlns[2].length>0){
+                        [_, burything, buriedperson] = Arrayedlns
+                        let lns=[]
+                        let lastlnpt=""
+                        for(let r1=1;r1==3;r1++){
+                            let ln =""
+                            for(let r2=1;r2==7;r2++){ln=ln+burything}
+                            lns.push(ln)
+                            lastlnpt=lastlnpt+burything
+                        }
+                        lns.push(lastlnpt+buriedperson+lastlnpt)
+                        let returnedlns= [Defaultstrs[0]+burything+Defaultstrs[1]+buriedperson+Defaultstrs[2]].concat(lns).join('\n')
+                        message.channel.send(returnedlns)
+                    }
+                }
             }
         }
     }

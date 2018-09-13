@@ -83,6 +83,12 @@ function repeatcom(message, botid){
     setTimeout(looper, 100*(10+botid), ch, ArrayedMsg, reNum);
 }
 
+function WATIIN(){
+    const today = new Date()
+    let ahour = today.getHours()>=3 ? today.getHours()>6 ? today.getHours()>9 ? today.getHours()>12 ? today.getHours()>15 ? today.getHours()>18 ? today.getHours()>22 ? "深夜":"夜":"午後":"昼頃":"午前":"朝":"早朝":"未明"
+    return `${today.getDay}日${ahour}`
+}
+
 class EmojiCache{
     constructor(name, id, isanim){
         if(name){this.name=name}else{this.name=null}
@@ -168,5 +174,5 @@ class EmojiStorage extends Array{
         }
     }
 }
-module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, typecheck, repeatcom}
+module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, typecheck, repeatcom, WATIIN}
 
