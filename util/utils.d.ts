@@ -46,6 +46,13 @@ declare module './utils'{
     var PinDestCh:Array<{channel:Discord.TextChannel,guild:Discord.Guild}>;
     var pinnedmsgids:Array<string>;
     /**
+     *実際にリピートコマンドを送信します。
+     *
+     * @param {Discord.Message} message
+     * @param {Number} botid
+     */
+    function repeatcom(message:Discord.Message, botid:Number):void;
+    /**
      *絵文字をDistuffBots内でキャッシュする際に扱われるオブジェクトのクラスです。
      *ボットがアクセスできないギルドに属した絵文字もキャッシュできますが、使用することはできません。
      *

@@ -64,6 +64,22 @@ function msgtrans(destch, msgs, transrep) {
 var PinObserveChs = [];
 var PinDestCh = [];
 
+function repeatcom(message, botid){
+    let ArrayedMsg = message.content.split(' ->|');
+    let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, botid);
+    let ch;
+    if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
+        let chs = message.mentions.channels.array();
+        ch = chs[chs.length - 1];
+        //console.log(chs);
+    } else {
+        ch = message.channel;
+    }
+
+    message.channel.send('ｋ');
+    setTimeout(looper, 100*(10+botid), ch, ArrayedMsg, reNum);
+}
+
 class EmojiCache{
     constructor(name, id, isanim){
         if(name){this.name=name}else{this.name=null}
@@ -149,5 +165,5 @@ class EmojiStorage extends Array{
         }
     }
 }
-module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, typecheck}
+module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, typecheck, repeatcom}
 

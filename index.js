@@ -293,28 +293,7 @@ client0.on('message', message => {
 client1.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
-            let ArrayedMsg = message.content.split(' ->|');
-            //var amariplus = (ArrayedMsg, conum) => {
-            //const amari = Number(ArrayedMsg[0].replace('/Re: ', '')) % 8)
-            //if (amari >= conum) {
-            //return 1;
-            //} else {
-            //return 0;
-            //}
-            //}
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 1);
-            console.log(distuff_util.amariplus(ArrayedMsg, 1));
-            let ch;
-            if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
-                let chs = message.mentions.channels.array();
-                ch = chs[chs.length - 1];
-                //console.log(chs);
-            } else {
-                ch = message.channel;
-            }
-
-            message.channel.send('ｋ');
-            setTimeout(distuff_util.looper, 1200, ch, ArrayedMsg, reNum);
+            distuff_util.repeatcom(message, 1)
         }
     }
     // Send the message to a designated channel on a server:
@@ -327,19 +306,7 @@ client1.on('message', message => {
 client2.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
-            let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 2);
-            let ch;
-            if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
-                let chs = message.mentions.channels.array();
-                ch = chs[chs.length - 1];
-                //console.log(chs);
-            } else {
-                ch = message.channel;
-            }
-
-            message.channel.send('ｋ');
-            setTimeout(distuff_util.looper, 1400, ch, ArrayedMsg, reNum);
+            distuff_util.repeatcom(message, 2)
         }
     }
     // Send the message to a designated channel on a server:
@@ -352,19 +319,7 @@ client2.on('message', message => {
 client3.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
-            let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 3);
-            let ch;
-            if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
-                let chs = message.mentions.channels.array();
-                ch = chs[chs.length - 1];
-                //console.log(chs);
-            } else {
-                ch = message.channel;
-            }
-
-            message.channel.send('ｋ');
-            setTimeout(distuff_util.looper, 1600, ch, ArrayedMsg, reNum);
+            distuff_util.repeatcom(message, 3)
         }
     }
     // Send the message to a designated channel on a server:
@@ -377,19 +332,7 @@ client3.on('message', message => {
 client4.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
-            let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 4);
-            let ch;
-            if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
-                let chs = message.mentions.channels.array();
-                ch = chs[chs.length - 1];
-                //console.log(chs);
-            } else {
-                ch = message.channel;
-            }
-
-            message.channel.send('ｋ');
-            setTimeout(distuff_util.looper, 1800, ch, ArrayedMsg, reNum);
+            distuff_util.repeatcom(message, 4)
         }
     }
     // Send the message to a designated channel on a server:
@@ -402,19 +345,7 @@ client4.on('message', message => {
 client5.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
-            let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 5);
-            let ch;
-            if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
-                let chs = message.mentions.channels.array();
-                ch = chs[chs.length - 1];
-                //console.log(chs);
-            } else {
-                ch = message.channel;
-            }
-
-            message.channel.send('ｋ');
-            setTimeout(distuff_util.looper, 1100, ch, ArrayedMsg, reNum);
+            distuff_util.repeatcom(message, 5)
         }
     }
     // Send the message to a designated channel on a server:
@@ -427,19 +358,7 @@ client5.on('message', message => {
 client6.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
-            let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 6);
-            let ch;
-            if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
-                let chs = message.mentions.channels.array();
-                ch = chs[chs.length - 1];
-                //console.log(chs);
-            } else {
-                ch = message.channel;
-            }
-
-            message.channel.send('ｋ');
-            setTimeout(distuff_util.looper, 1300, ch, ArrayedMsg, reNum);
+            distuff_util.repeatcom(message, 6)
         }
     }
     // Send the message to a designated channel on a server:
@@ -452,19 +371,7 @@ client6.on('message', message => {
 client7.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
-            let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 7);
-            let ch;
-            if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
-                let chs = message.mentions.channels.array();
-                ch = chs[chs.length - 1];
-                //console.log(chs);
-            } else {
-                ch = message.channel;
-            }
-
-            message.channel.send('ｋ');
-            setTimeout(distuff_util.looper, 1500, ch, ArrayedMsg, reNum);
+            distuff_util.repeatcom(message, 7)
         }
     }
     // Send the message to a designated channel on a server:
@@ -477,19 +384,7 @@ client7.on('message', message => {
 client8.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
-            let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 8);
-            let ch;
-            if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
-                let chs = message.mentions.channels.array();
-                ch = chs[chs.length - 1];
-                //console.log(chs);
-            } else {
-                ch = message.channel;
-            }
-
-            message.channel.send('ｋ');
-            setTimeout(distuff_util.looper, 1700, ch, ArrayedMsg, reNum);
+            distuff_util.repeatcom(message, 8)
         }
     }
     // Send the message to a designated channel on a server:
@@ -502,19 +397,7 @@ client8.on('message', message => {
 client9.on('message', message => {
     if (message.type == 'DEFAULT') {
         if (message.content.indexOf('/Re: ') == 0) {
-            let ArrayedMsg = message.content.split(' ->|');
-            let reNum = Math.floor(ArrayedMsg[0].replace('/Re: ', '') / 10) + distuff_util.amariplus(ArrayedMsg, 9);
-            let ch;
-            if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
-                let chs = message.mentions.channels.array();
-                ch = chs[chs.length - 1];
-                //console.log(chs);
-            } else {
-                ch = message.channel;
-            }
-
-            message.channel.send('ｋ');
-            setTimeout(distuff_util.looper, 1900, ch, ArrayedMsg, reNum);
+            distuff_util.repeatcom(message, 9)
         }
     }
     // Send the message to a designated channel on a server:
