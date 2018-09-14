@@ -87,7 +87,7 @@ function repeatcom(message, botid){
 function WATIIN(){
     const today = new offsettedDate(540)
     let date = today.getDate()
-    let ahour = today.getHours()>=3 ? today.getHours()>6 ? today.getHours()>9 ? today.getHours()>12 ? today.getHours()>15 ? today.getHours()>18 ? today.getHours()>22 ? "深夜":"夜":"午後":"昼頃":"午前":"朝":"早朝":"未明"
+    let ahour = today.getHours()>=3 ? today.getHours()>6 ? today.getHours()>9 ? today.getHours()>=12 ? today.getHours()>15 ? today.getHours()>18 ? today.getHours()>21 ? "深夜":"夜":"午後":"昼頃":"午前":"朝":"早朝":"未明"
     return `${date}日${ahour}`
 }
 
