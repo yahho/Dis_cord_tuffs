@@ -297,18 +297,14 @@ client0.on('message', message => {
                 //踏むとビデオ通話の画面が開くcanaryのリンクを生成します。
                 let targetvoicech = message.member.voiceChannel
                 if (targetvoicech == null) {
-                    message.channel.send('あんたが参加してるVCが、ないやん！\nどうしてくれるの、これ。').then(sendedres => {
-                        setTimeout(sendedres.delete, 6000)
-                    })
+                    message.channel.send('あんたが参加してるVCが、ないやん！\nどうしてくれるの、これ。');
                 }else{
                     let res = new Discord.RichEmbed();
                     res.setTitle('ご注文はこちらのビデオ通話ですか？');
                     res.setColor([156, 58, 190]);
                     res.addField("お待たせいたしました。こちら、", `[${targetvoicech[0].name}](${vidlinkbase[0]}${targetvoicech[0].guild.id}${vidlinkbase[1]}${targetvoicech[0].id})になります。`);
                     res.setFooter("以上でよろしいですね。");
-                    message.channel.send(res).then(sendedres => {
-                        setTimeout(sendedres.delete, 6000)
-                    });
+                    message.channel.send(res);
                 }
 
             }
