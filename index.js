@@ -302,7 +302,7 @@ client0.on('message', message => {
                     let res = new Discord.RichEmbed();
                     res.setTitle('ご注文はこちらのビデオ通話ですか？');
                     res.setColor([156, 58, 190]);
-                    res.addField("お待たせいたしました。こちら、", `[${targetvoicech[0].name}](${vidlinkbase[0]}${targetvoicech[0].guild.id}${vidlinkbase[1]}${targetvoicech[0].id})になります。`);
+                    res.addField("お待たせいたしました。こちら、", `[${targetvoicech.name}](${vidlinkbase[0]}${targetvoicech.guild.id}${vidlinkbase[1]}${targetvoicech.id})になります。`);
                     res.setFooter("以上でよろしいですね。");
                     message.channel.send(res);
                 }
