@@ -223,9 +223,9 @@ client0.on('message', message => {
                     let guildemojis = message.guild.emojis.array();
                     //console.log(guildemojis);
                     guildemojis.forEach(emoji =>{emoji = new distuff_util.EmojiCache(null,null,null,emoji);});
-                    guildemojis=new distuff_util.EmojiStorage(guildemojis);
+                    guildemojistore=new distuff_util.EmojiStorage(guildemojis);
                     console.log(guildemojis);
-                    let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, guildemojis);
+                    let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, guildemojistore);
                     let tmp = {groups:[tmpgemojis]};
                     //console.log(tmp);
                     FS.writeFileSync(`${message.guild.name}.json`, JSON.stringify(tmp, null,`\t`))
