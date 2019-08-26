@@ -224,7 +224,7 @@ client0.on('message', message => {
                     message.guild.emojis.array().forEach(emoji =>{const e = new distuff_util.EmojiCache(null,null,null,emoji);guildemojis.push(e);})
                     let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, new distuff_util.EmojiStorage(guildemojis))
                     let tmp = {groups:[tmpgemojis]}
-                    FS.writeFileSync(`${message.guild.name}.json`, JSON.stringify(tmp, null,`\t`),{encoding='utf8'})
+                    FS.writeFileSync(`${message.guild.name}.json`, JSON.stringify(tmp, null,`\t`))
                     message.channel.send({files:[{attachment: `${message.guild.name}.json`,name:`${message.guild.name}.json`}]})
                 }
             } else if (message.content.indexOf('PinRemoverStart') == 7) {
