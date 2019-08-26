@@ -224,7 +224,8 @@ client0.on('message', message => {
                     //console.log(guildemojis);
                     let guildemojicaches=[];
                     guildemojis.forEach(emoji =>{guildemojicaches.push(new distuff_util.EmojiCache(null,null,null,emoji))});
-                    guildemojistore=new distuff_util.EmojiStorage(guildemojicaches);
+                    let guildemojistore=new distuff_util.EmojiStorage();
+                    guildemojistore.concat(guildemojicaches);
                     console.log(guildemojistore);
                     let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, guildemojistore);
                     let tmp = {groups:[tmpgemojis]};
