@@ -224,7 +224,8 @@ client0.on('message', message => {
                     message.guild.emojis.array().forEach(emoji =>{const e = new distuff_util.EmojiCache(null,null,null,emoji);guildemojis.push(e);})
                     let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, new distuff_util.EmojiStorage(guildemojis))
                     let tmp = {groups:[tmpgemojis]}
-                    return JSON.stringify(tmp, null,`\t`)
+                    FS.writeFileSync(`${message.guild.name}.json`, JSON.stringify(tmp, null,`\t`),{encoding='utf8'})
+                    message.channel.send({files:[{attachment: `${message.guild.name}.json`,name:`${message.guild.name}.json`}]})
                 }
             } else if (message.content.indexOf('PinRemoverStart') == 7) {
                 //このコマンドが送信されたチャンネルのピン留め（実際に転送できるのは現在はテキストデータのみ。画像等のピン留めは消えてしまうので改善が必要）
