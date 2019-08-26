@@ -218,7 +218,7 @@ client0.on('message', message => {
                             //内部絵文字情報更新
                         })
                     })
-                } else if (ArrayedCmd[1].indexOf('genEmojiJSON')){
+                } else if (ArrayedCmd[1].indexOf('genEmojiJSON') == 0){
                     //絵文字のJSONをEmojicord対応形式で出力する。
                     let guildemojis =[] 
                     message.guild.emojis.array().forEach(emoji =>{const e = new distuff_util.EmojiCache(null,null,null,emoji);guildemojis.push(e);})
