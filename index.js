@@ -222,9 +222,10 @@ client0.on('message', message => {
                     //絵文字のJSONをEmojicord対応形式で出力する。
                     let guildemojis = message.guild.emojis.array();
                     //console.log(guildemojis);
-                    guildemojis.forEach(emoji =>{emoji = new distuff_util.EmojiCache(null,null,null,emoji);});
-                    guildemojistore=new distuff_util.EmojiStorage(guildemojis);
-                    console.log(guildemojis);
+                    let guildemojicaches=[];
+                    guildemojis.forEach(emoji =>{guildemojicaches.push(new distuff_util.EmojiCache(null,null,null,emoji))});
+                    guildemojistore=new distuff_util.EmojiStorage(guildemojicaches);
+                    console.log(guildemojicaches);
                     let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, guildemojistore);
                     let tmp = {groups:[tmpgemojis]};
                     //console.log(tmp);
