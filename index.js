@@ -221,11 +221,12 @@ client0.on('message', message => {
                 } else if (ArrayedCmd[1].indexOf('genEmojiJSON') == 0){
                     //絵文字のJSONをEmojicord対応形式で出力する。
                     let guildemojis = message.guild.emojis.array();
-                    console.log(guildemojis);
+                    //console.log(guildemojis);
                     guildemojis.forEach(emoji =>{emoji = new distuff_util.EmojiCache(null,null,null,emoji);});
                     guildemojis=new distuff_util.EmojiStorage(guildemojis);
                     let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, guildemojis);
                     let tmp = {groups:[tmpgemojis]};
+                    console.log(tmp);
                     FS.writeFileSync(`${message.guild.name}.json`, JSON.stringify(tmp, null,`\t`))
                     message.channel.send({files:[{attachment: `${message.guild.name}.json`,name:`${message.guild.name}.json`}]})
                 }
