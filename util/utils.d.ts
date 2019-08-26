@@ -70,7 +70,7 @@ declare module './utils'{
         public name:string;
         public id:string;
         public isanim:boolean;
-        constructor(name?:string, id?:string, isanim?:boolean)
+        constructor(name?:string, id?:string, isanim?:boolean, emojiobj?:Discord.Emoji)
         /**
          *これを使うと絵文字の実際の文字列（そのまま投稿すると絵文字に変換される文字列）からEmojiCacheに変換できます。
          *
@@ -128,5 +128,13 @@ declare module './utils'{
 
         public first():EmojiCache;
     }
+
+    class GuildEmojiStorage{
+        constructor(guildname:string, guildid:string, emojiarray:EmojiStorage<EmojiCache>)
+
+        public toJSONString():string;
+    }
+
+    var VoiceChatCache:Array<{req_user:Discord.GuildMemberResolvable, channel:Discord.VoiceChannel}>
 }
 

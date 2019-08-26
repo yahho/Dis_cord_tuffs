@@ -92,10 +92,15 @@ function WATIIN(){
 }
 
 class EmojiCache{
-    constructor(name, id, isanim){
+    constructor(name, id, isanim, emojiobj){
         if(name){this.name=name}else{this.name=null}
         if(id){this.id=id}else{this.id=null}
         if(isanim){this.isanim=isanim}else{this.isanim=null}
+        if(emojiobj){
+            this.name = emojiobj.name;
+            this.id = emojiobj.id;
+            this.isanim = emojiobj.animated;
+        }
     }
 
     fromString(str){
@@ -170,11 +175,26 @@ class EmojiStorage extends Array{
     fromJSONArray(array){
         if(typecheck(array)!='array'){throw new TypeError(`入力は配列でなければなりません。判定された型: ${typecheck(array)}`)}else{
             array.forEach(consemo => {
-                this.push(new EmojiCache(consemo.name, consemo.id, consemo.isanim))
+                this.push(new EmojiCache(consemo.name, consemo.id, consemo.isanim));
             },this);
             return this;
         }
     }
 }
-module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, typecheck, repeatcom, WATIIN}
+
+class GuildEmojiStorage{
+    constructor(guildname, guildid, emojiarray){
+        this.name=guildname;
+        this.id=guildid;
+        this.emojis=emojiarray;
+        this.emojis.forEach(emoji => {
+            delete emoji.isanim;
+        })
+    }
+
+    toJSONString(){
+        return JSON.stringify(this)
+    }
+}
+module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, GuildEmojiStorage, typecheck, repeatcom, WATIIN}
 

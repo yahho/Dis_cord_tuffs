@@ -218,6 +218,13 @@ client0.on('message', message => {
                             //内部絵文字情報更新
                         })
                     })
+                } else if (ArrayedCmd[1].indexOf('genEmojiJSON')){
+                    //絵文字のJSONをEmojicord対応形式で出力する。
+                    let guildemojis =[] 
+                    message.guild.emojis.array().forEach(emoji =>{const e = new distuff_util.EmojiCache(null,null,null,emoji);guildemojis.push(e);})
+                    let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, new distuff_util.EmojiStorage(guildemojis))
+                    let tmp = {groups:[tmpgemojis]}
+                    return JSON.stringify(tmp, null,`\t`)
                 }
             } else if (message.content.indexOf('PinRemoverStart') == 7) {
                 //このコマンドが送信されたチャンネルのピン留め（実際に転送できるのは現在はテキストデータのみ。画像等のピン留めは消えてしまうので改善が必要）
@@ -307,6 +314,12 @@ client0.on('message', message => {
                     message.channel.send(res);
                 }
 
+            } else if (message.content.indexOf('Help') == 7) {
+                //ヘルプを表示します。
+            } else if (message.content.indexOf('InviteBots') == 7) {
+                //Botの招待リンクを発行します。
+            } else if (message.content.indexOf('BridgeChannel') == 7) {
+                //ボイスチャットを接続します
             }
         }
     }
