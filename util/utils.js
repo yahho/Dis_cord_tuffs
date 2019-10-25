@@ -87,7 +87,7 @@ function repeatcom(message, botid){
 function WATIIN(){
     const today = new offsettedDate(540)
     let date = today.getDate()
-    let ahour = today.getHours()>=3 ? today.getHours()>6 ? today.getHours()>9 ? today.getHours()>=12 ? today.getHours()>15 ? today.getHours()>18 ? today.getHours()>21 ? "深夜":"夜":"午後":"昼頃":"午前":"朝":"早朝":"未明"
+    let ahour = today.getHours()>=3 ? today.getHours()>6 ? today.getHours()>9 ? today.getHours()>=12 ? today.getHours()>15 ? today.getHours()>18 ? today.getHours()>21 ? "深夜":"夜":"午後":"昼頃":"午前":"朝":"早朝":"深夜"
     return `${date}日${ahour}`
 }
 
@@ -182,6 +182,11 @@ class EmojiStorage extends Array{
     }
 }
 
+/**
+ *EmojicordJSON生成用絵文字コンテナです。
+ *
+ * @class GuildEmojiStorage
+ */
 class GuildEmojiStorage{
     constructor(guildname, guildid, emojiarray){
         this.name=guildname;
@@ -196,5 +201,21 @@ class GuildEmojiStorage{
         return JSON.stringify(this)
     }
 }
-module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, GuildEmojiStorage, typecheck, repeatcom, WATIIN}
+
+class Permission{
+    constructor(guild){
+        this.rules=[];
+        if (FS.existsSync(`./permission/`)) {
+            if (FS.existsSync(`./permission/${guild.id}.json`)){
+                JSON.parse(FS.readFileSync(`./permission/${guild.id}.json`))
+            } else {}
+        }
+    }
+
+
+}
+class PermissionElement{}
+class PermissionTarget{}
+class PermissionDirection{}
+module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, GuildEmojiStorage, typecheck, repeatcom, WATIIN, Permission}
 

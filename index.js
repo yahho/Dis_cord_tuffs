@@ -42,7 +42,7 @@ const vidlinkbase = ["https://canary.discordapp.com/channels/", "/"]
 
 //ログイン用関数
 function loginer() {
-    client0.login(tokens[0]);
+    client0.login(process.env.BK_1);
     client1.login(tokens[1]);
     client2.login(tokens[2]);
     client3.login(tokens[3]);
@@ -58,6 +58,8 @@ function loginer() {
 // from Discord _after_ ready is emitted
 client0.on('ready', () => {
     console.log('I am ready.');
+    //client0.permission = new distuff_util.Permission(client0.guilds);
+    //client0.guilds.array()[0].members.array()[0].permissions.has(Discord.Permissions.FLAGS.MANAGE_GUILD);
 });
 client1.on('ready', () => {
     console.log('I am ready!');
@@ -97,7 +99,9 @@ client0.on('message', message => {
             let reNum = Math.floor(Number(ArrayedMsg[0].replace('/Re: ', '')) / 10);
             //チャンネル指定の検出と反映
             let ch;
-            if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
+            if (message.mentions.users.array().some(user => {return user.bot})) {
+                message.author.createDM().then(dmch=>{ch=dmch})
+            } else if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
                 let chs = message.mentions.channels.array();
                 ch = chs[chs.length - 1];
                 //console.log(chs);
@@ -221,15 +225,12 @@ client0.on('message', message => {
                 } else if (ArrayedCmd[1].indexOf('genEmojiJSON') == 0){
                     //絵文字のJSONをEmojicord対応形式で出力する。
                     let guildemojis = message.guild.emojis.array();
-                    //console.log(guildemojis);
                     let guildemojistore=new distuff_util.EmojiStorage();
                     guildemojis.forEach(emoji =>{guildemojistore.push(new distuff_util.EmojiCache(null,null,null,emoji))});
-                    console.log(guildemojistore);
                     let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, guildemojistore);
                     let tmp = {groups:[tmpgemojis]};
-                    console.log(tmp);
-                    FS.writeFileSync(`${message.guild.name}.json`, JSON.stringify(tmp, null,`\t`))
-                    message.channel.send({files:[{attachment: `${message.guild.name}.json`,name:`${message.guild.name}.json`}]})
+                    FS.writeFileSync(`${message.guild.id}.json`, JSON.stringify(tmp, null,`\t`))
+                    message.channel.send({files:[{attachment: `${message.guild.id}.json`,name:`${message.guild.name}.json`}]})
                 }
             } else if (message.content.indexOf('PinRemoverStart') == 7) {
                 //このコマンドが送信されたチャンネルのピン留め（実際に転送できるのは現在はテキストデータのみ。画像等のピン留めは消えてしまうので改善が必要）
@@ -323,6 +324,7 @@ client0.on('message', message => {
                 //ヘルプを表示します。
             } else if (message.content.indexOf('InviteBots') == 7) {
                 //Botの招待リンクを発行します。
+                message.channel.send('導入を検討いただきありがとうございます。\n以下のリンク先で追加したいサーバーを選択し、\`認証\`ボタンを押してください。\n||https://discordapp.com/api/oauth2/authorize?client_id=446678468931878912&permissions=120974400&scope=bot||');
             } else if (message.content.indexOf('BridgeChannel') == 7) {
                 //ボイスチャットを接続します
             }
