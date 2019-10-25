@@ -2,6 +2,9 @@
     "name": "discordspicierbots",
     "version": "1.0.0",
     "description": "Spicise your discord chat!!",
+    "engines": {
+        "node" : "8.11.1"
+    },
     "main": "index.js",
     "scripts": {
         "build": "tsc",
