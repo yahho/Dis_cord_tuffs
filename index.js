@@ -43,15 +43,15 @@ const vidlinkbase = ["https://canary.discordapp.com/channels/", "/"]
 //ログイン用関数
 function loginer() {
     client0.login(process.env.BK_1);
-    client1.login(tokens[1]);
-    client2.login(tokens[2]);
-    client3.login(tokens[3]);
-    client4.login(tokens[4]);
-    client5.login(tokens[5]);
-    client6.login(tokens[6]);
-    client7.login(tokens[7]);
-    client8.login(tokens[8]);
-    client9.login(tokens[9]);
+    client1.login(process.env.BK_2);
+    client2.login(process.env.BK_3);
+    client3.login(process.env.BK_4);
+    client4.login(process.env.BK_5);
+    client5.login(process.env.BK_6);
+    client6.login(process.env.BK_7);
+    client7.login(process.env.BK_8);
+    client8.login(process.env.BK_9);
+    client9.login(process.env.BK_10);
 }
 
 // The ready event is vital, it means that your bot will only start reacting to information
