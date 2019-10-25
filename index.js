@@ -28,8 +28,6 @@ FS.readFile('emotes.json', 'utf-8', function (err, data) {
 })
 
 // The token of your bot - https://discordapp.com/developers/applications/me
-//トークンのアレイ
-const tokens=JSON.parse(FS.readFileSync('tokens.json', 'utf-8'))
 //転送済みメッセージのIDのアレイを格納する奇妙な拡張子のファイルを読み込む
 distuff_util.pinnedmsgids=JSON.parse(FS.readFileSync("pinned.json","utf-8"));
 
