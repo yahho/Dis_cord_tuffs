@@ -360,7 +360,7 @@ client0.on('message', message => {
 }).on('voiceStateUpdate', (OldVoiceStat, NewVoiceStat) => {
     //VCに誰かが入ったり抜けたりしたとき
     console.log("VoiceStateUpdate event has fired!")
-    let NoLongerUsedVCh = TempLabeledVCList.find(vc => {vc.issuer == OldVoiceStat.id && vc.targetID != NewVoiceStat.voiceChannelID})
+    let NoLongerUsedVCh = TempLabeledVCList.find(vc => vc.issuer == OldVoiceStat.id && vc.targetID != NewVoiceStat.voiceChannelID)
     console.log(TempLabeledVCList)
     console.log(OldVoiceStat.id)
     console.log(NewVoiceStat.voiceChannelID)
