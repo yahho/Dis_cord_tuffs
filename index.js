@@ -332,7 +332,7 @@ client0.on('message', message => {
                 let originTitle = targetCh.name;
                 let TempTitle = [...originTitle][0]+message.content.split(" ")[2];
                 TempLabeledVCList.push({issuer:authorID, targetID:targetCh.id, originTitle:originTitle, guild:message.guild.id})
-                targetCh.setName(TempTitle, `${targetCh}の一時的なタイトルの設定が${message.author}(${message.author.username}#${message.author.tag})によって要求されました。`)
+                targetCh.setName(TempTitle, `${targetCh}の一時的なタイトルの設定が${message.author}(${message.author.tag})によって要求されました。`)
             }
         }
     }
@@ -361,7 +361,7 @@ client0.on('message', message => {
     //VCに誰かが入ったり抜けたりしたとき
     let NoLongerUsedVCh = TempLabeledVCList.find(vc => vc.issuer == OldVoiceStat.id && vc.targetID != NewVoiceStat.voiceChannelID);
     if (NoLongerUsedVCh !== undefined){
-        client0.guilds.get(NoLongerUsedVCh.guild).channels.get(NoLongerUsedVCh.targetID).setName(NoLongerUsedVCh.originTitle ,`<@${NoLongerUsedVCh.author}>が<#${NoLongerUsedVCh.targetID}>を退出したため一時的なタイトルの必要性はもはや認められません。`);
+        client0.guilds.get(NoLongerUsedVCh.guild).channels.get(NoLongerUsedVCh.targetID).setName(NoLongerUsedVCh.originTitle ,`<@${NoLongerUsedVCh.issuer}>(${client0.users.get(NoLongerUsedVCh.issuer).tag})が<#${NoLongerUsedVCh.targetID}>を退出したため一時的なタイトルの必要性はもはや認められません。`);
         TempLabeledVCList = TempLabeledVCList.filter(vc => vc != NoLongerUsedVCh);
     }
 });
