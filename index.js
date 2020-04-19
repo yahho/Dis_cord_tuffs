@@ -38,8 +38,11 @@ var pindestch = distuff_util.PinDestCh;
 //GetVidChLink用のストリング
 const vidlinkbase = ["https://canary.discordapp.com/channels/", "/"]
 
+//VCTitle用Array<obj>
+var TempLabeledVCList = []
+
 //ログイン用関数
-function loginer() {
+function loginall() {
     client0.login(process.env.BK_1);
     client1.login(process.env.BK_2);
     client2.login(process.env.BK_3);
@@ -50,6 +53,20 @@ function loginer() {
     client7.login(process.env.BK_8);
     client8.login(process.env.BK_9);
     client9.login(process.env.BK_10);
+}
+
+//すべてのインスタンスをオフラインにします(ログオフ)
+function offlineall() {
+    client0.destroy();
+    client1.destroy();
+    client2.destroy();
+    client3.destroy();
+    client4.destroy();
+    client5.destroy();
+    client6.destroy();
+    client7.destroy();
+    client8.destroy();
+    client9.destroy();
 }
 
 // The ready event is vital, it means that your bot will only start reacting to information
@@ -143,29 +160,11 @@ client0.on('message', message => {
                                 } else if (r.emoji.name === '✅') {
                                     console.log('終了します。。。');
                                     //ボットをオフラインにした後プログラムを強制終了
-                                    client0.destroy();
-                                    client1.destroy();
-                                    client2.destroy();
-                                    client3.destroy();
-                                    client4.destroy();
-                                    client5.destroy();
-                                    client6.destroy();
-                                    client7.destroy();
-                                    client8.destroy();
-                                    client9.destroy();
+                                    offlineall();
                                     setTimeout(process.exit, 1000, 0);
                                 } else if (r.emoji.name === '🔄') {
-                                    client0.destroy();
-                                    client1.destroy();
-                                    client2.destroy();
-                                    client3.destroy();
-                                    client4.destroy();
-                                    client5.destroy();
-                                    client6.destroy();
-                                    client7.destroy();
-                                    client8.destroy();
-                                    client9.destroy();
-                                    setTimeout(loginer, 15000);
+                                    offlineall();
+                                    setTimeout(loginall, 15000);
                                 }
                             });
                         });
@@ -325,6 +324,15 @@ client0.on('message', message => {
                 message.channel.send('導入を検討いただきありがとうございます。\n以下のリンク先で追加したいサーバーを選択し、\`認証\`ボタンを押してください。\n||https://discordapp.com/api/oauth2/authorize?client_id=446678468931878912&permissions=120974400&scope=bot||');
             } else if (message.content.indexOf('BridgeChannel') == 7) {
                 //ボイスチャットを接続します
+            } else if (message.content.indexOf('VCTitle') == 7){
+                //VCのタイトルを一時的に書き換えて利用目的がわかるようにします
+                let authorID = message.author.id;
+                let targetCh = message.guild.members.get(authorID).voiceChannel;
+                if (targetCh === undefined){message.channel.send(`Hey ${message.author}, そもそもVCに参加していませんね。。。？`);return;}
+                let originTitle = targetCh.name;
+                let TempTitle = originTitle.slice(0,1)+message.content.split(" ")[2];
+                TempLabeledVCList.push({issuer:authorID, targetID:targetCh.id, originTitle:originTitle})
+                targetCh.setName(TempTitle, `Temporary title of ${targetCh} set triggered by ${message.author}`)
             }
         }
     }
@@ -348,6 +356,12 @@ client0.on('message', message => {
                 })[0].channel, [react.message], 1);
             }
         }
+    }
+}).on('voiceStateUpdate', (OldVoiceStat,NewVoiceStat) => {
+    //VCに誰かが入ったり抜けたりしたとき
+    let NoLongerUsedVCh = TempLabeledVCList.find(vc => {vc.issuer == OldVoiceStat.id && vc.targetID != NewVoiceStat.voiceChannelID})
+    if (NoLongerUsedVCh !== undefined){
+        client0.channels.get(NoLongerUsedVCh.targetID).setName(NoLongerUsedVCh.originTitle);
     }
 });
 
@@ -471,4 +485,4 @@ client9.on('message', message => {
 });
 
 // Log our bot in
-loginer();
+loginall();
