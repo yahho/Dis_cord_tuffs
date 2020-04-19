@@ -330,7 +330,7 @@ client0.on('message', message => {
                 let targetCh = message.guild.members.get(authorID).voiceChannel;
                 if (targetCh === undefined){message.channel.send(`Hey ${message.author}, そもそもVCに参加していませんね。。。？`);return;}
                 let originTitle = targetCh.name;
-                let TempTitle = originTitle.slice(0,1)+message.content.split(" ")[2];
+                let TempTitle = [...originTitle][0]+message.content.split(" ")[2];
                 TempLabeledVCList.push({issuer:authorID, targetID:targetCh.id, originTitle:originTitle, guild:message.guild.id})
                 targetCh.setName(TempTitle, `${targetCh}の一時的なタイトルの設定が${message.author}(${message.author.username}#${message.author.tag})によって要求されました。`)
             }
