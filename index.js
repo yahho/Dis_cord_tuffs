@@ -361,7 +361,7 @@ client0.on('message', message => {
     //VCに誰かが入ったり抜けたりしたとき
     let NoLongerUsedVCh = TempLabeledVCList.find(vc => vc.issuer == OldVoiceStat.id && vc.targetID != NewVoiceStat.voiceChannelID);
     if (NoLongerUsedVCh !== undefined){
-        client0.guilds.get(NoLongerUsedVCh.guild).channels.get(NoLongerUsedVCh.targetID).setName(NoLongerUsedVCh.originTitle ,`${message.author}(${message.author.username}#${message.author.tag})が<#${NoLongerUsedVCh.targetID}>を退出したため一時的なタイトルの必要性はもはや認められません。`);
+        client0.guilds.get(NoLongerUsedVCh.guild).channels.get(NoLongerUsedVCh.targetID).setName(NoLongerUsedVCh.originTitle ,`<@${NoLongerUsedVCh.author}>(${client0.users.get(NoLongerUsedVCh.author).username}#${client0.users.get(NoLongerUsedVCh.author).tag})が<#${NoLongerUsedVCh.targetID}>を退出したため一時的なタイトルの必要性はもはや認められません。`);
         TempLabeledVCList = TempLabeledVCList.filter(vc => vc != NoLongerUsedVCh);
     }
 });
