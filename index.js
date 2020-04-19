@@ -359,6 +359,7 @@ client0.on('message', message => {
     }
 }).on('voiceStateUpdate', (OldVoiceStat,NewVoiceStat) => {
     //VCに誰かが入ったり抜けたりしたとき
+    console.log("VoiceStateUpdate event has fired!")
     let NoLongerUsedVCh = TempLabeledVCList.find(vc => {vc.issuer == OldVoiceStat.id && vc.targetID != NewVoiceStat.voiceChannelID})
     if (NoLongerUsedVCh !== undefined){
         client0.guilds.get(NoLongerUsedVCh.guild).channels.get(NoLongerUsedVCh.targetID).setName(NoLongerUsedVCh.originTitle ,`Issuer <@${NoLongerUsedVCh.issuer}> leaved from <#${NoLongerUsedVCh.targetID}, so temporary title is no longer needed.`);
