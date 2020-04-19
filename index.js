@@ -331,7 +331,7 @@ client0.on('message', message => {
                 if (targetCh === undefined){message.channel.send(`Hey ${message.author}, そもそもVCに参加していませんね。。。？`);return;}
                 let originTitle = targetCh.name;
                 let TempTitle = originTitle.slice(0,1)+message.content.split(" ")[2];
-                TempLabeledVCList.push({issuer:authorID, targetID:targetCh.id, originTitle:originTitle})
+                TempLabeledVCList.push({issuer:authorID, targetID:targetCh.id, originTitle:originTitle, guild:message.guild.id})
                 targetCh.setName(TempTitle, `Temporary title of ${targetCh} set triggered by ${message.author}`)
             }
         }
@@ -361,7 +361,7 @@ client0.on('message', message => {
     //VCに誰かが入ったり抜けたりしたとき
     let NoLongerUsedVCh = TempLabeledVCList.find(vc => {vc.issuer == OldVoiceStat.id && vc.targetID != NewVoiceStat.voiceChannelID})
     if (NoLongerUsedVCh !== undefined){
-        client0.channels.get(NoLongerUsedVCh.targetID).setName(NoLongerUsedVCh.originTitle);
+        client0.guilds.get(NoLongerUsedVCh.guild).channels.get(NoLongerUsedVCh.targetID).setName(NoLongerUsedVCh.originTitle ,`Issuer <@${NoLongerUsedVCh.issuer}> leaved from <#${NoLongerUsedVCh.targetID}, so temporary title is no longer needed.`);
     }
 });
 
