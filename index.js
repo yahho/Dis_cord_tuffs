@@ -34,6 +34,7 @@ distuff_util.pinnedmsgids=JSON.parse(FS.readFileSync("pinned.json","utf-8"));
 //📌転送用の配列達
 var pinobservechs = distuff_util.PinObserveChs;
 var pindestch = distuff_util.PinDestCh;
+var pinTransmissionPairs = [];
 
 //GetVidChLink用のストリング
 const vidlinkbase = ["https://canary.discordapp.com/channels/", "/"]
@@ -115,11 +116,10 @@ client0.on('message', message => {
             let reNum = Math.floor(Number(ArrayedMsg[0].replace('/Re: ', '')) / 10);
             //チャンネル指定の検出と反映
             let ch;
-            if (message.mentions.users.array().some(user => {return user.bot})) {
+            if (message.mentions.users.some(user => {return user.bot})) {
                 message.author.createDM().then(dmch=>{ch=dmch})
-            } else if (ArrayedMsg[2] && message.mentions.channels.values().length != 0) {
-                let chs = message.mentions.channels.array();
-                ch = chs[chs.length - 1];
+            } else if (ArrayedMsg[2] && message.mentions.channels.some(gch => gch.type=="text")) {
+                ch = message.mentions.channels.filter(gch => gch.type=="text").last();
                 //console.log(chs);
             } else {
                 //デフォルト動作としてメッセージが送信された場所を指定
@@ -137,7 +137,7 @@ client0.on('message', message => {
                     //perm:command.system.Kill
                     //const author = message.author;
                     console.log(`終了要請を受信。送信者: ${message.author.username}`)
-                    let reallykill = new Discord.RichEmbed();
+                    let reallykill = new Discord.MessageEmbed();
                     reallykill.setTitle('本当にこのBotを終了しますか？');
                     reallykill.setColor([255, 0, 0]);
                     reallykill.addField('終了するとこのBotのすべての機能を利用できなくなります', '本当にこのBotを終了しますか？', false);
@@ -150,21 +150,22 @@ client0.on('message', message => {
                             //Embedの投稿が正常に完了したときの処理
                             embed.react('✅').then(embed.react('🛑').then(embed.react('🔄')));
                             //✅か🛑か🔄がコマンドメッセージを送った人によってリアクションされたときだけ反応するようにフィルタ
-                            const filter = (reaction, user) => reaction.emoji.name === '✅' && user === message.author || reaction.emoji.name === '🛑' && user === message.author || reaction.emoji.name === '🔄' && user === message.author
+                            let reactStr = "✅🛑🔄"
+                            const filter = (reaction, user) => (user === message.author) && ([...reactStr].some(react => react === reaction.emoji.name))
                             var collector = embed.createReactionCollector(filter);
-                            collector.on('collect', r => {
+                            embed.awaitReactions(filter).then(r => {
                                 //上のフィルタで引っかかったときの処理
-                                console.log(`${r.emoji.name}が認識されました`);
-                                if (r.emoji.name === '🛑') {
+                                console.log(`${r.first().emoji.name}が認識されました`);
+                                if (r.first().emoji.name === '🛑') {
                                     console.log('終了をキャンセルします。。。');
                                     embed.delete();
                                     message.delete();
-                                } else if (r.emoji.name === '✅') {
+                                } else if (r.first().emoji.name === '✅') {
                                     console.log('終了します。。。');
                                     //ボットをオフラインにした後プログラムを強制終了
                                     offlineall();
                                     setTimeout(process.exit, 1000, 0);
-                                } else if (r.emoji.name === '🔄') {
+                                } else if (r.first().emoji.name === '🔄') {
                                     offlineall();
                                     setTimeout(loginall, 15000);
                                 }
@@ -226,7 +227,7 @@ client0.on('message', message => {
                 } else if (ArrayedCmd[1].indexOf('genEmojiJSON') == 0){
                     //perm:command.emoji.GenEmojicordJSON
                     //絵文字のJSONをEmojicord対応形式で出力する。
-                    let guildemojis = message.guild.emojis.array();
+                    let guildemojis = message.guild.emojis;
                     let guildemojistore=new distuff_util.EmojiStorage();
                     guildemojis.forEach(emoji =>{guildemojistore.push(new distuff_util.EmojiCache(null,null,null,emoji))});
                     let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, guildemojistore);
@@ -239,12 +240,11 @@ client0.on('message', message => {
                 //このコマンドが送信されたチャンネルのピン留め（実際に転送できるのは現在はテキストデータのみ。画像等のピン留めは消えてしまうので改善が必要）
                 //を別のチャンネルに移すというもの
                 //メッセージ内のチャンネルメンションから転送先を決定する
-                let destchl = message.mentions.channels.array();
-                let destch = destchl[destchl.length - 1];
+                let destch = message.mentions.channels.last();
                 message.channel.fetchPinnedMessages()
                     .then(msgsb => {
-                        let msgs = msgsb.array();
-                        for (let transrep = 1; transrep <= msgs.length; transrep++) {
+                        let msgs = msgsb;
+                        for (let transrep = 1; transrep <= msgs.size; transrep++) {
                             setTimeout(distuff_util.msgtrans, 3000 * transrep, destch, msgs, transrep);
                         }
                         message.channel.send('移行処理発行を完了しました。しばらくお待ち下さい...');
@@ -253,36 +253,33 @@ client0.on('message', message => {
                 if (ArrayedCmd[1].indexOf('Enable') == 0) {
                     //perm:command.pin.observeandcopy.channel
                     //TODO:クライアントのイベントから拾うように書き直す
-                    let transdestch = message.mentions.channels.array()[message.mentions.channels.array().length - 1];
-                    var pinmsgcoll = message.channel.createMessageCollector(function (msg) {
-                        //ここのフィルタは今のところは特に意味をなしていない。（）
-                        return msg.type == 'DEFAULT';
-                    });
-                    pinmsgcoll.on('collect', obsmsg => {
-                        let pinreactcoll=obsmsg.createReactionCollector(function (reaction) {
-                            return reaction.emoji.name === '📌';
-                        }).once('collect', react => {
-                            let transmsgs = [];
-                            transmsgs.push(react.message);
-                            //このコードはDate.prototype.toLocaleString()だと自分の環境では日本語表記にできなかったので
-                            //date-fnsのformatとその日本語ロケールを使って実現するためにいろいろ試した痕跡です。
-                            //console.log(datefns(react.message.createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp}));
-                            distuff_util.msgtrans(transdestch, transmsgs, 1);
-                            //message.embeds[0].type
-                            pinreactcoll.stop();
-                        })
-                    })
-
+                    let transdestch = message.mentions.channels.last();
+                    pinTransmissionPairs.push({destCh:transdestch, collectCh:message.channel})
+                    
                 }else if (ArrayedCmd[1].indexOf('Guild')==0) {
                     //perm:command.pin.observeandcopy.guild
                     //このコマンドで、コマンドメッセージを投稿したギルド全体のテキストチャンネルにて
                     //ボット起動後に投稿されたメッセージに対してつけられた📌リアクションで
                     //指定したチャンネルに転送するように設定する。
-                    pinobservechs = message.guild.channels.filterArray(function (guildch){
+                    //チャンネルの指定はチャンネルメンションで行う。
+                    pinobservechs = message.guild.channels.filter(guildch =>
                         //ここでテキストチャンネルだけ取り出す
-                        if (guildch.type == "text") {return true;} else {return false;}
-                    })
-                    pindestch.push({channel:message.mentions.channels.last(),guild:message.mentions.channels.last().guild});
+                        (guildch.type == "text") ? true : false
+                    );
+                    for (collCh of pinobservechs){
+                        pinTransmissionPairs.push({destCh:message.mentions.channels.last(), collectCh:collCh})
+                    }
+                }else if (ArrayedCmd[1].indexOf('Disable') == 0){
+                    //ピン止め転送されてくるのを止めたいチャンネルでこのコマンドを打つと、
+                    //そのチャンネルではあらゆる場所からのピン止め転送を拒否する設定が作動するようになります。
+                    //チャンネルメンションで特定の1チャンネルからのみを遮断することもできます。
+                    let cancellObserveCh = message.mentions.channels.last();
+                    if (cancellObserveCh !== undefined){
+                        pinTransmissionPairs = pinTransmissionPairs.filter(pair => pair != {destCh:message.channel, collectCh:cancellObserveCh})
+                    } else {
+                        pinTransmissionPairs = pinTransmissionPairs.filter(pair => pair.destCh != message.channel)
+                    }
+                    
                 }
             } else if (message.content.indexOf('DedNewsGen') == 7) {
                 //perm:command.util.DedNewsGen
@@ -295,8 +292,8 @@ client0.on('message', message => {
                     let buriedperson=""
                     if(Arrayedlns[1].length>0 && Arrayedlns[2].length>0){
                         [_, burything, buriedperson] = Arrayedlns;
-                        burything.endsWith(" ") ? burything=burything : burything=burything+" "
-                        buriedperson.endsWith(" ") ? buriedperson=buriedperson : buriedperson=buriedperson+" "
+                        burything.endsWith(" ") ? burything=[...burything].slice(0, burything.lastIndexOf(" ")).join() : burything=burything
+                        buriedperson.endsWith(" ") ? [...buriedperson].slice(0, buriedperson.lastIndexOf(" ")).join() : buriedperson=buriedperson
                         let lns=[];
                         let lastlnpt=[];
                         for (var r1=0;r1!=3;r1++) {
@@ -315,11 +312,11 @@ client0.on('message', message => {
             } else if (message.content.indexOf('GetVidChLink') == 7) {
                 //perm:command.util.GetVidChLink
                 //踏むとビデオ通話の画面が開くcanaryのリンクを生成します。
-                let targetvoicech = message.member.voiceChannel
-                if (targetvoicech == null) {
+                let targetvoicech = message.member.voice.channel
+                if (targetvoicech === undefined) {
                     message.channel.send('あんたが参加してるVCが、ないやん！\nどうしてくれるの、これ。');
                 }else{
-                    let res = new Discord.RichEmbed();
+                    let res = new Discord.MessageEmbed();
                     res.setTitle('ご注文はこちらのビデオ通話ですか？');
                     res.setColor([156, 58, 190]);
                     res.addField("お待たせいたしました。こちら、", `[${targetvoicech.name}](${vidlinkbase[0]}${targetvoicech.guild.id}${vidlinkbase[1]}${targetvoicech.id})になります。`);
@@ -341,7 +338,7 @@ client0.on('message', message => {
                 //perm:command.util.VCTempTitle
                 //VCのタイトルを一時的に書き換えて利用目的がわかるようにします
                 let authorID = message.author.id;
-                let targetCh = message.guild.members.get(authorID).voiceChannel;
+                let targetCh = message.member.voice.channel;
                 if (targetCh === undefined){message.channel.send(`Hey ${message.author}, そもそもVCに参加していませんね。。。？`);return;}
                 let originTitle = targetCh.name;
                 let TempTitle = [...originTitle][0]+message.content.split(" ")[2];
@@ -360,15 +357,11 @@ client0.on('message', message => {
     //channel.send(`Welcome to the server, ${member}`);
 }).on('messageReactionAdd', react => {
     if (react.emoji.name === '📌'){
-        if (pinobservechs.includes(react.message.channel)) {
+        if (pinTransmissionPairs.find(pair => pair.CollectCh == react.message.channel)!==undefined) {
             //対象のチャンネルかどうかを確認
-            if (pindestch.filter(function (chset){
-                return chset.guild === react.message.guild;
-            }).length != 0){
+            for (targetPairs of pinTransmissionPairs.filter(pair => pair.CollectCh == react.message.channel)){
                 //送り先のチャンネルの確認
-                distuff_util.msgtrans(pindestch.filter(function (chset){
-                    return chset.guild === react.message.guild                    
-                })[0].channel, [react.message], 1);
+                distuff_util.msgtrans(targetPairs.destCh, [react.message], 1);
             }
         }
     }
