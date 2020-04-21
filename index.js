@@ -109,6 +109,7 @@ client0.on('message', message => {
     if (message.type == 'DEFAULT') {
         //スパイシーにするコマンド認識
         if (message.content.indexOf('/Re: ') == 0) {
+            //perm:command.util.RepeatPost
             //メッセージの解釈をするための分割
             let ArrayedMsg = message.content.split(' ->|');
             let reNum = Math.floor(Number(ArrayedMsg[0].replace('/Re: ', '')) / 10);
@@ -133,6 +134,7 @@ client0.on('message', message => {
             let ArrayedCmd = message.content.split('.')
             if (message.content.indexOf('System') == 7) {
                 if (ArrayedCmd[1] === 'kill') {
+                    //perm:command.system.Kill
                     //const author = message.author;
                     console.log(`終了要請を受信。送信者: ${message.author.username}`)
                     let reallykill = new Discord.RichEmbed();
@@ -173,6 +175,7 @@ client0.on('message', message => {
             } else if (message.content.indexOf('Emoji') == 7) {
                 //絵文字関連コマンド
                 if (ArrayedCmd[1].indexOf('post') == 0) {
+                    //perm:command.emoji.Post
                     //絵文字投稿コマンド
                     let emoId = ArrayedCmd[1].split(' ')[1];
                     //絵文字があるか確認
@@ -190,6 +193,7 @@ client0.on('message', message => {
                         message.channel.send(`<${anim}:${emoName}:${emoId}>`);
                     }
                 } else if (ArrayedCmd[1].indexOf('add') == 0) {
+                    //perm:command.emoji.Add
                     //絵文字の追加
                     let newemoIsanim,
                         newemoId,
@@ -220,6 +224,7 @@ client0.on('message', message => {
                         })
                     })
                 } else if (ArrayedCmd[1].indexOf('genEmojiJSON') == 0){
+                    //perm:command.emoji.GenEmojicordJSON
                     //絵文字のJSONをEmojicord対応形式で出力する。
                     let guildemojis = message.guild.emojis.array();
                     let guildemojistore=new distuff_util.EmojiStorage();
@@ -230,6 +235,7 @@ client0.on('message', message => {
                     message.channel.send({files:[{attachment: `${message.guild.id}.json`,name:`${message.guild.name}.json`}]})
                 }
             } else if (message.content.indexOf('PinRemoverStart') == 7) {
+                //perm:command.pin.RemoverTool
                 //このコマンドが送信されたチャンネルのピン留め（実際に転送できるのは現在はテキストデータのみ。画像等のピン留めは消えてしまうので改善が必要）
                 //を別のチャンネルに移すというもの
                 //メッセージ内のチャンネルメンションから転送先を決定する
@@ -245,6 +251,7 @@ client0.on('message', message => {
                     })
             } else if (message.content.indexOf('PinTransmitter') == 7) {
                 if (ArrayedCmd[1].indexOf('Enable') == 0) {
+                    //perm:command.pin.observeandcopy.channel
                     //TODO:クライアントのイベントから拾うように書き直す
                     let transdestch = message.mentions.channels.array()[message.mentions.channels.array().length - 1];
                     var pinmsgcoll = message.channel.createMessageCollector(function (msg) {
@@ -267,6 +274,7 @@ client0.on('message', message => {
                     })
 
                 }else if (ArrayedCmd[1].indexOf('Guild')==0) {
+                    //perm:command.pin.observeandcopy.guild
                     //このコマンドで、コマンドメッセージを投稿したギルド全体のテキストチャンネルにて
                     //ボット起動後に投稿されたメッセージに対してつけられた📌リアクションで
                     //指定したチャンネルに転送するように設定する。
@@ -277,6 +285,7 @@ client0.on('message', message => {
                     pindestch.push({channel:message.mentions.channels.last(),guild:message.mentions.channels.last().guild});
                 }
             } else if (message.content.indexOf('DedNewsGen') == 7) {
+                //perm:command.util.DedNewsGen
                 let Arrayedlns = message.content.split(/\r\n|\r|\n/g)
                 let Defaultstrs = ["に埋もれてdedしている", "が発見された。"].reverse()
                 Defaultstrs.push(`${distuff_util.WATIIN()}、果実都某所で、`)
@@ -304,6 +313,7 @@ client0.on('message', message => {
                     }
                 }
             } else if (message.content.indexOf('GetVidChLink') == 7) {
+                //perm:command.util.GetVidChLink
                 //踏むとビデオ通話の画面が開くcanaryのリンクを生成します。
                 let targetvoicech = message.member.voiceChannel
                 if (targetvoicech == null) {
@@ -318,21 +328,26 @@ client0.on('message', message => {
                 }
 
             } else if (message.content.indexOf('Help') == 7) {
+                //perm:command.general.Help
                 //ヘルプを表示します。
             } else if (message.content.indexOf('InviteBots') == 7) {
+                //perm:command.general.Invitebot
                 //Botの招待リンクを発行します。
                 message.channel.send('導入を検討いただきありがとうございます。\n以下のリンク先で追加したいサーバーを選択し、\`認証\`ボタンを押してください。\n||https://discordapp.com/api/oauth2/authorize?client_id=446678468931878912&permissions=120974400&scope=bot||');
             } else if (message.content.indexOf('BridgeChannel') == 7) {
-                //ボイスチャットを接続します
+                //perm:command.util.BridgeCh
+                //ボイスチャット同士を接続します
             } else if (message.content.indexOf('VCTitle') == 7){
+                //perm:command.util.VCTempTitle
                 //VCのタイトルを一時的に書き換えて利用目的がわかるようにします
                 let authorID = message.author.id;
                 let targetCh = message.guild.members.get(authorID).voiceChannel;
                 if (targetCh === undefined){message.channel.send(`Hey ${message.author}, そもそもVCに参加していませんね。。。？`);return;}
                 let originTitle = targetCh.name;
                 let TempTitle = [...originTitle][0]+message.content.split(" ")[2];
-                TempLabeledVCList.push({issuer:authorID, targetID:targetCh.id, originTitle:originTitle, guild:message.guild.id})
-                targetCh.setName(TempTitle, `${targetCh}の一時的なタイトルの設定が${message.author}(${message.author.tag})によって要求されました。`)
+                TempLabeledVCList.push({issuer:authorID, targetID:targetCh.id, originTitle:originTitle, guild:message.guild.id});
+                targetCh.setName(TempTitle, `${targetCh}の一時的なタイトルの設定が${message.author}(${message.author.tag})によって要求されました。`);
+                message.delete();
             }
         }
     }

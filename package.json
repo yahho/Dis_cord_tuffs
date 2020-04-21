@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Spicise your discord chat!!",
     "engines": {
-        "node" : "8.11.1"
+        "node": "12.x"
     },
     "main": "index.js",
     "scripts": {
@@ -14,17 +14,17 @@
     "license": "MIT",
     "dependencies": {
         "@discordjs/uws": "^11.149.1",
-        "@types/node": "^12.11.7",
+        "@types/node": "^13.13.1",
         "bufferutil": "^4.0.1",
-        "date-fns": "^2.6.0",
+        "date-fns": "^2.12.0",
         "date-with-offset": "^1.0.1",
-        "discord.js": "^11.5.1",
+        "discord.js": "^12.2.0",
         "erlpack": "github:discordapp/erlpack",
         "libsodium-wrappers": "^0.7.6",
-        "node-gyp": "^6.0.0",
+        "node-gyp": "^6.1.0",
         "node-opus": "^0.3.3",
         "opusscript": "0.0.7",
-        "typescript": "^3.6.4",
+        "typescript": "^3.8.3",
         "uws": "^100.0.1"
     }
 }
