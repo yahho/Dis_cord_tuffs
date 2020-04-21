@@ -19,7 +19,7 @@
         "date-fns": "^2.12.0",
         "date-with-offset": "^1.0.1",
         "discord.js": "^12.2.0",
-        "erlpack": "github:discordapp/erlpack^0.1.3",
+        "erlpack": "github:discordapp/erlpack",
         "libsodium-wrappers": "^0.7.6",
         "node-gyp": "^6.1.0",
         "node-opus": "^0.3.3",
