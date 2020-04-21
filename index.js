@@ -342,7 +342,14 @@ client0.on('message', message => {
                 if (targetCh === undefined){message.channel.send(`Hey ${message.author}, そもそもVCに参加していませんね。。。？`);return;}
                 let originTitle = targetCh.name;
                 let TempTitle = [...originTitle][0]+message.content.split(" ")[2];
-                TempLabeledVCList.push({issuer:authorID, targetID:targetCh.id, originTitle:originTitle, guild:message.guild.id});
+                if (TempLabeledVCList.find(VCConf => VCConf.targetID == targetCh.id && VCConf.guild == message.guild.id) !== undefined){
+                    tmp_VCConf = TempLabeledVCList.find(VCConf => VCConf.targetID == targetCh.id && VCConf.guild == message.guild.id);
+                    TempLabeledVCList = TempLabeledVCList.filter(VCConf => VCConf != tmp_VCConf);
+                    tmp_VCConf.issuer = authorID;
+                    TempLabeledVCList.push(tmp_VCConf);
+                }else{
+                    TempLabeledVCList.push({issuer:authorID, targetID:targetCh.id, originTitle:originTitle, guild:message.guild.id});
+                }
                 targetCh.setName(TempTitle, `${targetCh}の一時的なタイトルの設定が${message.author}(${message.author.tag})によって要求されました。`);
                 message.delete();
             }
