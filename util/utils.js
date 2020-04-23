@@ -245,5 +245,5 @@ class PermissionManager{
 }
 class PermissionUser{}
 class PermissionNode{}
-module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, GuildEmojiStorage, typecheck, repeatcom, WATIIN, Permission}
+module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, GuildEmojiStorage, typecheck, repeatcom, WATIIN}
 
