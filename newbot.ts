@@ -7,6 +7,16 @@ import Discord = require('discord.js');
 
 import distuff_util = require('./util/utils');
 
+class PinTransPair {
+    public destCh:Discord.TextChannel;
+    public collectCh:Discord.TextChannel;
+    constructor(DestinarionChannel:Discord.TextChannel, CollectingChannel:Discord.TextChannel){
+        this.destCh = DestinarionChannel;
+        this.collectCh = CollectingChannel;
+    } 
+}
+
+
 // Create an instance of a Discord client
 const client0 = new Discord.Client();
 const client1 = new Discord.Client();
@@ -34,7 +44,7 @@ distuff_util.pinnedmsgids=JSON.parse(FS.readFileSync("pinned.json","utf-8"));
 //📌転送用の配列達
 
 var pindestch = distuff_util.PinDestCh;
-var pinTransmissionPairs = [];
+var pinTransmissionPairs:Array<PinTransPair> = [];
 
 //GetVidChLink用のストリング
 const vidlinkbase = ["https://canary.discordapp.com/channels/", "/"]
@@ -257,8 +267,9 @@ client0.on('message', message => {
                 if (ArrayedCmd[1].indexOf('Enable') == 0) {
                     //perm:command.pin.observeandcopy.channel
                     //TODO:クライアントのイベントから拾うように書き直す
+                    if (message.channel instanceof Discord.DMChannel||message.channel instanceof Discord.NewsChannel) return;
                     let transdestch = message.mentions.channels.last();
-                    pinTransmissionPairs.push({destCh:transdestch, collectCh:message.channel})
+                    pinTransmissionPairs.push(new PinTransPair(transdestch, message.channel));
                     
                 }else if (ArrayedCmd[1].indexOf('Guild')==0) {
                     //perm:command.pin.observeandcopy.guild
@@ -274,7 +285,7 @@ client0.on('message', message => {
                     pinObserveChCollection.forEach(Ch => pinobservechs.push(Ch as Discord.TextChannel));
                     
                     for (let collCh of pinobservechs){
-                        pinTransmissionPairs.push({destCh:message.mentions.channels.last(), collectCh:collCh})
+                        pinTransmissionPairs.push(new PinTransPair(message.mentions.channels.last(), collCh));
                     }
                 }else if (ArrayedCmd[1].indexOf('Disable') == 0){
                     //ピン止め転送されてくるのを止めたいチャンネルでこのコマンドを打つと、
@@ -371,9 +382,9 @@ client0.on('message', message => {
     //channel.send(`Welcome to the server, ${member}`);
 }).on('messageReactionAdd', react => {
     if (react.emoji.name === '📌'){
-        if (pinTransmissionPairs.find(pair => pair.CollectCh == react.message.channel)!==undefined) {
+        if (pinTransmissionPairs.find(pair => pair.collectCh == react.message.channel)!==undefined) {
             //対象のチャンネルかどうかを確認
-            for (let targetPairs of pinTransmissionPairs.filter(pair => pair.CollectCh == react.message.channel)){
+            for (let targetPairs of pinTransmissionPairs.filter(pair => pair.collectCh == react.message.channel)){
                 //送り先のチャンネルの確認
                 distuff_util.msgtrans(targetPairs.destCh, [react.message], 1);
             }
