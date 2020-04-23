@@ -3,9 +3,9 @@
 */
 
 // Import the discord.js module
-const Discord = require('discord.js')
+import Discord = require('discord.js');
 
-const distuff_util = require('./util/utils')
+import distuff_util = require('./util/utils');
 
 // Create an instance of a Discord client
 const client0 = new Discord.Client();
@@ -20,8 +20,8 @@ const client8 = new Discord.Client();
 const client9 = new Discord.Client();
 
 //奇妙な拡張子のファイルパーサー(emotesという名前で奇妙な拡張子のファイル)
-var emostore_json = new distuff_util.EmojiStorage();
-var FS = require('fs');
+var emostore_json= new distuff_util.EmojiStorage<distuff_util.EmojiCache>();
+import FS = require('fs');
 FS.readFile('emotes.json', 'utf-8', function (err, data) {
     if (err) throw err;
     emostore_json.fromJSONArray(JSON.parse(data));
@@ -32,7 +32,7 @@ FS.readFile('emotes.json', 'utf-8', function (err, data) {
 distuff_util.pinnedmsgids=JSON.parse(FS.readFileSync("pinned.json","utf-8"));
 
 //📌転送用の配列達
-var pinobservechs = distuff_util.PinObserveChs;
+
 var pindestch = distuff_util.PinDestCh;
 var pinTransmissionPairs = [];
 
@@ -118,8 +118,8 @@ client0.on('message', message => {
             let ch;
             if (message.mentions.users.some(user => {return user.bot})) {
                 message.author.createDM().then(dmch=>{ch=dmch})
-            } else if (ArrayedMsg[2] && message.mentions.channels.some(gch => gch.type=="text")) {
-                ch = message.mentions.channels.filter(gch => gch.type=="text").last();
+            } else if (ArrayedMsg[2]) {
+                ch = message.mentions.channels.last();
                 //console.log(chs);
             } else {
                 //デフォルト動作としてメッセージが送信された場所を指定
@@ -148,10 +148,14 @@ client0.on('message', message => {
                     message.channel.send(reallykill)
                         .then(embed => {
                             //Embedの投稿が正常に完了したときの処理
-                            embed.react('✅').then(embed.react('🛑').then(embed.react('🔄')));
+                            embed.react('✅')
+                            .then(returnedreaction => returnedreaction.message.react('🛑')
+                            .then(returnedreaction => returnedreaction.message.react('🔄')));
                             //✅か🛑か🔄がコマンドメッセージを送った人によってリアクションされたときだけ反応するようにフィルタ
                             let reactStr = "✅🛑🔄"
-                            const filter = (reaction, user) => (user === message.author) && ([...reactStr].some(react => react === reaction.emoji.name));
+                            const filter:Discord.CollectorFilter = (reaction:Discord.MessageReaction, user:Discord.User) => {
+                                return ((user === message.author) && ([...reactStr].some(react => react === reaction.emoji.name)));
+                            }
                             embed.awaitReactions(filter).then(r => {
                                 //上のフィルタで引っかかったときの処理
                                 console.log(`${r.first().emoji.name}が認識されました`);
@@ -196,7 +200,7 @@ client0.on('message', message => {
                 } else if (ArrayedCmd[1].indexOf('add') == 0) {
                     //perm:command.emoji.Add
                     //絵文字の追加
-                    let newemoIsanim,
+                    let newemoIsanim:boolean,
                         newemoId,
                         newemoName;
                     let str=ArrayedCmd[1].slice(4);
@@ -213,7 +217,7 @@ client0.on('message', message => {
                     if(newemoIsanim){anim = "a"}else{anim = ""}
                     message.channel.send(`<${anim}:${newemoName}:${newemoId}>を追加しています。。。`);
                     let emojic = new distuff_util.EmojiCache(newemoName, newemoId, newemoIsanim);
-                    emostore_json.push(emojic.toObject());
+                    emostore_json.push(emojic);
                     FS.writeFile('emotes.json', JSON.stringify(emostore_json), 'utf-8', function (err) {
                         //非同期な書き込み
                         if (err) { console.log(err); }
@@ -227,8 +231,8 @@ client0.on('message', message => {
                 } else if (ArrayedCmd[1].indexOf('genEmojiJSON') == 0){
                     //perm:command.emoji.GenEmojicordJSON
                     //絵文字のJSONをEmojicord対応形式で出力する。
-                    let guildemojis = message.guild.emojis;
-                    let guildemojistore=new distuff_util.EmojiStorage();
+                    let guildemojis = message.guild.emojis.cache;
+                    let guildemojistore=new distuff_util.EmojiStorage<distuff_util.EmojiCache>();
                     guildemojis.forEach(emoji =>{guildemojistore.push(new distuff_util.EmojiCache(null,null,null,emoji))});
                     let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, guildemojistore);
                     let tmp = {groups:[tmpgemojis]};
@@ -241,7 +245,7 @@ client0.on('message', message => {
                 //を別のチャンネルに移すというもの
                 //メッセージ内のチャンネルメンションから転送先を決定する
                 let destch = message.mentions.channels.last();
-                message.channel.fetchPinnedMessages()
+                message.channel.messages.fetchPinned()
                     .then(msgsb => {
                         let msgs = msgsb;
                         for (let transrep = 1; transrep <= msgs.size; transrep++) {
@@ -262,11 +266,14 @@ client0.on('message', message => {
                     //ボット起動後に投稿されたメッセージに対してつけられた📌リアクションで
                     //指定したチャンネルに転送するように設定する。
                     //チャンネルの指定はチャンネルメンションで行う。
-                    pinobservechs = message.guild.channels.filter(guildch =>
-                        //ここでテキストチャンネルだけ取り出す
-                        (guildch.type == "text") ? true : false
+                    let pinobservechs:Array<Discord.TextChannel>;
+                    let pinObserveChCollection = message.guild.channels.cache.filter(guildch =>
+                        //ここでテキストチャンネルだけ取り出す。まだGuildChannelのまま。
+                        guildch.type == "text"
                     );
-                    for (collCh of pinobservechs){
+                    pinObserveChCollection.forEach(Ch => pinobservechs.push(Ch as Discord.TextChannel));
+                    
+                    for (let collCh of pinobservechs){
                         pinTransmissionPairs.push({destCh:message.mentions.channels.last(), collectCh:collCh})
                     }
                 }else if (ArrayedCmd[1].indexOf('Disable') == 0){
@@ -291,7 +298,7 @@ client0.on('message', message => {
                     let burything=""
                     let buriedperson=""
                     if(Arrayedlns[1].length>0 && Arrayedlns[2].length>0){
-                        [_, burything, buriedperson] = Arrayedlns;
+                        [burything, buriedperson] = Arrayedlns.shift();
                         burything.endsWith(" ") ? burything=[...burything].slice(0, burything.lastIndexOf(" ")).join() : burything=burything
                         buriedperson.endsWith(" ") ? [...buriedperson].slice(0, buriedperson.lastIndexOf(" ")).join() : buriedperson=buriedperson
                         let lns=[];
@@ -343,7 +350,7 @@ client0.on('message', message => {
                 let originTitle = targetCh.name;
                 let TempTitle = [...originTitle][0]+message.content.split(" ")[2];
                 if (TempLabeledVCList.find(VCConf => VCConf.targetID == targetCh.id && VCConf.guild == message.guild.id) !== undefined){
-                    tmp_VCConf = TempLabeledVCList.find(VCConf => VCConf.targetID == targetCh.id && VCConf.guild == message.guild.id);
+                    let tmp_VCConf = TempLabeledVCList.find(VCConf => VCConf.targetID == targetCh.id && VCConf.guild == message.guild.id);
                     TempLabeledVCList = TempLabeledVCList.filter(VCConf => VCConf != tmp_VCConf);
                     tmp_VCConf.issuer = authorID;
                     TempLabeledVCList.push(tmp_VCConf);
@@ -366,7 +373,7 @@ client0.on('message', message => {
     if (react.emoji.name === '📌'){
         if (pinTransmissionPairs.find(pair => pair.CollectCh == react.message.channel)!==undefined) {
             //対象のチャンネルかどうかを確認
-            for (targetPairs of pinTransmissionPairs.filter(pair => pair.CollectCh == react.message.channel)){
+            for (let targetPairs of pinTransmissionPairs.filter(pair => pair.CollectCh == react.message.channel)){
                 //送り先のチャンネルの確認
                 distuff_util.msgtrans(targetPairs.destCh, [react.message], 1);
             }
@@ -374,7 +381,7 @@ client0.on('message', message => {
     }
 }).on('voiceStateUpdate', (OldVoiceStat, NewVoiceStat) => {
     //VCに誰かが入ったり抜けたりしたとき
-    let NoLongerUsedVCh = TempLabeledVCList.find(vc => vc.issuer == OldVoiceStat.id && vc.targetID != NewVoiceStat.voiceChannelID);
+    let NoLongerUsedVCh = TempLabeledVCList.find(vc => vc.issuer == OldVoiceStat.id && vc.targetID != NewVoiceStat.channelID);
     if (NoLongerUsedVCh !== undefined){
         client0.guilds.resolve(NoLongerUsedVCh.guild).channels.resolve(NoLongerUsedVCh.targetID).setName(NoLongerUsedVCh.originTitle ,`<@${NoLongerUsedVCh.issuer}>(${client0.users.resolve(NoLongerUsedVCh.issuer).tag})が<#${NoLongerUsedVCh.targetID}>を退出したため一時的なタイトルの必要性はもはや認められません。`);
         TempLabeledVCList = TempLabeledVCList.filter(vc => vc != NoLongerUsedVCh);
