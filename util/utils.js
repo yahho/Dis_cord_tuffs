@@ -41,7 +41,7 @@ function msgtrans(destch, msgs, transrep) {
         //↓の奴if挟んだほうがいいだろうか？
         msgs[transrep - 1].unpin();
         //転送するメッセージの投稿日時を取得してdate-fnsで日本語にする
-        posteddate = datefns(msgs[transrep - 1].createdAt,'YYYY[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp});
+        posteddate = datefns(msgs[transrep - 1].createdAt,'yyyy[年]MMMDodddd Ah[時]mm[分]ss[秒]',{locale:datefnsjp});
         //console.log(msgs[transrep-1].attachments.array()[0].url);
         if (msgs[transrep-1].attachments.array().length != 0) {
             //ファイルがくっついてればこっち
@@ -202,20 +202,48 @@ class GuildEmojiStorage{
     }
 }
 
-class Permission{
+class PermissionManager{
     constructor(guild){
         this.rules=[];
         if (FS.existsSync(`./permission/`)) {
             if (FS.existsSync(`./permission/${guild.id}.json`)){
-                JSON.parse(FS.readFileSync(`./permission/${guild.id}.json`))
-            } else {}
+                this.permCache = JSON.parse(FS.readFileSync(`./permission/${guild.id}.json`))
+            } else {
+                //default deny: command.system.kill, command.util.RepeatPost, command.pin.*
+                //default global permission: Permit
+            }
         }
     }
 
+    checkBotPerm(User, Node){//node -> user
+
+    }
+
+    checkUserPerm(User, action, to){
+        if (to === undefined){
+
+        }
+    }
+
+    swapPriority(from, to){
+        [this.permCache.CustomRule[from],this.permCache.CustomRule[to]] = [this.permCache.CustomRule[to],this.permCache.CustomRule[from]];
+        this.save()
+    }
+
+    addPerm(User, isPermit, Node){
+
+    }
+
+    removePerm(){
+
+    }
+
+    save(){
+
+    }
 
 }
-class PermissionElement{}
-class PermissionTarget{}
-class PermissionDirection{}
+class PermissionUser{}
+class PermissionNode{}
 module.exports ={repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, GuildEmojiStorage, typecheck, repeatcom, WATIIN, Permission}
 
