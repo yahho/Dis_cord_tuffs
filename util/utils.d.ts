@@ -115,6 +115,7 @@ declare module './utils'{
      * @template EmojiCache
      */
     class EmojiStorage<EmojiCache> extends Array<EmojiCache>{
+        constructor()
         constructor(array:Array<EmojiCache>)
         /**
          *JSON文字列に変換します。
@@ -136,5 +137,22 @@ declare module './utils'{
     }
 
     var VoiceChatCache:Array<{req_user:Discord.GuildMemberResolvable, channel:Discord.VoiceChannel}>
+
+    class PermissionManager{
+        constructor(guild:Discord.Guild)
+
+        public checkBotPerm(User:Discord.User, Node:string):PermissionResult;
+        public checkUserPerm(User:Discord.GuildMember, action:Discord.PermissionResolvable|Array<Discord.PermissionResolvable>, to:Discord.GuildChannel)
+        public swapPriority()
+        private save():void;
+    }
+
+    class PermissionResult{
+        constructor(isPermit:boolean, reason:PermissionElement)
+    }
+
+    class PermissionElement{
+
+    }
 }
 
