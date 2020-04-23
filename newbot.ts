@@ -13,9 +13,10 @@ class PinTransPair {
     constructor(DestinarionChannel:Discord.TextChannel, CollectingChannel:Discord.TextChannel){
         this.destCh = DestinarionChannel;
         this.collectCh = CollectingChannel;
+
+        this.collectCh.messages.fetch({limit:100});
     } 
 }
-
 
 // Create an instance of a Discord client
 const client0 = new Discord.Client();
