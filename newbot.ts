@@ -381,11 +381,13 @@ client0.on('message', message => {
     // Send the message, mentioning the member
     //channel.send(`Welcome to the server, ${member}`);
 }).on('messageReactionAdd', react => {
+    console.log("reaction detected.");
+    console.log(`That reaction's emoji name is ${react.emoji.name}.`);
     if (react.emoji.name === '📌'){
         console.log("Pin Detected!");
         if (pinTransmissionPairs.find(pair => pair.collectCh == react.message.channel)!==undefined) {
             //対象のチャンネルかどうかを確認
-            console.log("seems like observing channel...")
+            console.log("seems like observing channel...");
             for (let targetPairs of pinTransmissionPairs.filter(pair => pair.collectCh == react.message.channel)){
                 //送り先のチャンネルの確認
                 distuff_util.msgtrans(targetPairs.destCh, [react.message], 1);
