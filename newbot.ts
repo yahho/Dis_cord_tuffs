@@ -382,8 +382,10 @@ client0.on('message', message => {
     //channel.send(`Welcome to the server, ${member}`);
 }).on('messageReactionAdd', react => {
     if (react.emoji.name === '📌'){
+        console.log("Pin Detected!");
         if (pinTransmissionPairs.find(pair => pair.collectCh == react.message.channel)!==undefined) {
             //対象のチャンネルかどうかを確認
+            console.log("seems like observing channel...")
             for (let targetPairs of pinTransmissionPairs.filter(pair => pair.collectCh == react.message.channel)){
                 //送り先のチャンネルの確認
                 distuff_util.msgtrans(targetPairs.destCh, [react.message], 1);
