@@ -41,7 +41,7 @@ function msgtrans(destch, msgs, transrep) {
         //↓の奴if挟んだほうがいいだろうか？
         msgs[transrep - 1].unpin();
         //転送するメッセージの投稿日時を取得してdate-fnsで日本語にする
-        posteddate = datefns(msgs[transrep - 1].createdAt,'yyyy[年]MMMddeeee ah[時]mm[分]ss[秒]',{locale:datefnsjp});
+        posteddate = datefns(msgs[transrep - 1].createdAt,'yyyy年MMMdoeeee ah時mm分ss秒',{locale:datefnsjp});
         //console.log(msgs[transrep-1].attachments.array()[0].url);
         if (msgs[transrep-1].attachments.array().length != 0) {
             //ファイルがくっついてればこっち
