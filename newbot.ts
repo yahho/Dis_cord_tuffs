@@ -266,7 +266,7 @@ client0.on('message', message => {
                     //ボット起動後に投稿されたメッセージに対してつけられた📌リアクションで
                     //指定したチャンネルに転送するように設定する。
                     //チャンネルの指定はチャンネルメンションで行う。
-                    let pinobservechs:Array<Discord.TextChannel>;
+                    let pinobservechs:Array<Discord.TextChannel>=[];
                     let pinObserveChCollection = message.guild.channels.cache.filter(guildch =>
                         //ここでテキストチャンネルだけ取り出す。まだGuildChannelのまま。
                         guildch.type == "text"
