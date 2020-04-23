@@ -48,7 +48,7 @@ function msgtrans(destch, msgs, transrep) {
             var atch=msgs[transrep-1].attachments.array()[0].url;
             //Attachmentにはファイルのパス、URL、またはバッファを投げる。
             //contentの後にAttachmentやRichEmbedをブチ込むと一緒に投稿してくれる。
-            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。\n【ジャンプURL】:\n内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`,new Discord.Attachment(atch)).then(function(){
+            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。\n【ジャンプURL】:\n内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`,new Discord.MessageAttachment(atch)).then(function(){
                 pinnedmsgids.push(msgid);
                 FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
             })
