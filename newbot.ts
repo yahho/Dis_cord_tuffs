@@ -5,7 +5,7 @@
 // Import the discord.js module
 import Discord = require('discord.js');
 
-import distuff_util = require('./util/utils');
+import distuff_util = require('./util/newutils');
 
 class PinTransPair {
     public destCh:Discord.TextChannel;
@@ -31,7 +31,7 @@ const client8 = new Discord.Client();
 const client9 = new Discord.Client();
 
 //奇妙な拡張子のファイルパーサー(emotesという名前で奇妙な拡張子のファイル)
-var emostore_json= new distuff_util.EmojiStorage<distuff_util.EmojiCache>();
+var emostore_json = new distuff_util.EmojiStorage<distuff_util.EmojiCache>();
 import FS = require('fs');
 FS.readFile('emotes.json', 'utf-8', function (err, data) {
     if (err) throw err;
@@ -244,7 +244,7 @@ client0.on('message', message => {
                     //絵文字のJSONをEmojicord対応形式で出力する。
                     let guildemojis = message.guild.emojis.cache;
                     let guildemojistore=new distuff_util.EmojiStorage<distuff_util.EmojiCache>();
-                    guildemojis.forEach(emoji =>{guildemojistore.push(new distuff_util.EmojiCache(null,null,null,emoji))});
+                    guildemojis.forEach(emoji =>{guildemojistore.push(new distuff_util.EmojiCache(emoji))});
                     let tmpgemojis = new distuff_util.GuildEmojiStorage(message.guild.name, message.guild.id, guildemojistore);
                     let tmp = {groups:[tmpgemojis]};
                     FS.writeFileSync(`${message.guild.id}.json`, JSON.stringify(tmp, null,`\t`))
