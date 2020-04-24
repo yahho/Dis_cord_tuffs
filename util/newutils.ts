@@ -4,18 +4,18 @@ const datefns = require('date-fns/format');
 const datefnsjp = require('date-fns/locale/ja');
 const offsettedDate = require('date-with-offset');
 
-var pinnedmsgids=JSON.parse(FS.readFileSync('pinned.json','utf-8'));
+var pinnedmsgids:Array<string>=JSON.parse(FS.readFileSync('pinned.json','utf-8'));
 function typecheck(chkobj){
     return Object.prototype.toString.call(chkobj).slice(8, -1).toLowerCase()
 }
 
 //メッセージ送るだけ
-function repeater(ch, ArrayedMsg) {
+function repeater(ch:Discord.TextChannel, ArrayedMsg:Array<string>) {
     ch.send(ArrayedMsg[1]);
 }
 
 //上の関数repeater(ch, ArrayedMsg)をリピートさせる根幹部分
-function looper(ch, ArrayedMsg, reNum) {
+function looper(ch:Discord.TextChannel, ArrayedMsg:Array<string>, reNum:number) {
     for (let currentNum = 0; currentNum < reNum; ++currentNum) {
         //ここで1足して処理してないとｋ送信から時間が短すぎて途中で制限に引っかかると思う
         setTimeout(repeater, 1300 * (currentNum + 1), ch, ArrayedMsg);
@@ -23,8 +23,8 @@ function looper(ch, ArrayedMsg, reNum) {
 }
 
 //割った余りを基に不足分をそれぞれ追加する数値を作るための関数
-function amariplus(ArrayedMsg, conum) {
-    let amari = ArrayedMsg[0].replace('/Re: ', '') % 10;
+function amariplus(ArrayedMsg:Array<string>, conum:number) {
+    let amari = +ArrayedMsg[0].replace('/Re: ', '') % 10;
     if (amari >= conum) {
         return 1;
     } else {
@@ -33,30 +33,31 @@ function amariplus(ArrayedMsg, conum) {
 }
 
 //メッセージ転送用の関数
-function msgtrans(destch, msgs, transrep) {
-    if (pinnedmsgids.includes(msgs[transrep - 1].id)){
-        console.log(`すでに転送済みのメッセージ。メッセージID:${msgs[transrep - 1].id}`);
+function msgtrans(destch:Discord.TextChannel, msg:Discord.Message) {
+    if (pinnedmsgids.includes(msg.id)){
+        console.log(`すでに転送済みのメッセージ。メッセージID:${msg.id}`);
     }else{
-        let msgid = msgs[transrep - 1].id;
+        let msgid = msg.id;
         //↓の奴if挟んだほうがいいだろうか？
-        msgs[transrep - 1].unpin();
+        msg.unpin();
         //転送するメッセージの投稿日時を取得してdate-fnsで日本語にする
-        let posteddate = datefns(msgs[transrep - 1].createdAt,'yyyy年MMMdoeeee ah時mm分ss秒',{locale:datefnsjp});
-        //console.log(msgs[transrep-1].attachments.array()[0].url);
-        if (msgs[transrep-1].attachments.array().length != 0) {
+        let posteddate:string = datefns(msg.createdAt,'yyyy年MMMdoeeee Ho時mm分ss秒SSS',{locale:datefnsjp});
+        //console.log(msgs.attachments.array()[0].url);
+        let restext = `${msg.author}が${posteddate}に${msg.channel}で投稿した、ピン留め対象メッセージが転送されました。\n【ジャンプURL】: ${msg.url}\n内容は以下のとおりです。\n\n${msg.content}`;
+        if (msg.attachments.size != 0) {
             //ファイルがくっついてればこっち
-            let atchs=msgs[transrep-1].attachments;
-            let atchobjs=[];
+            let atchs=msg.attachments;
+            let atchobjs:Array<Discord.MessageAttachment>=[];
             atchs.forEach(atch => {atchobjs.push(new Discord.MessageAttachment(atch.url))});
             //Attachmentにはファイルのパス、URL、またはバッファを投げる。
             //contentの後にAttachmentやRichEmbedをブチ込むと一緒に投稿してくれる。
-            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。\n【ジャンプURL】: ${msgs[transrep - 1].url}\n内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`, atchobjs).then(function(){
+            destch.send(restext, atchobjs).then(function(){
                 pinnedmsgids.push(msgid);
                 FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
             })
         }else{
             //なんもくっついてなければこっち
-            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。\n【ジャンプURL】: ${msgs[transrep - 1].url}\n内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`).then(function(){
+            destch.send(restext).then(function(){
                 pinnedmsgids.push(msgid);
                 FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
             })
@@ -67,19 +68,23 @@ function msgtrans(destch, msgs, transrep) {
 var PinObserveChs = [];
 var PinDestCh = [];
 
-function repeatcom(message:Discord.Message, botid){
+function repeatcom(message:Discord.Message, botid:number){
     let ArrayedMsg = message.content.split(' ->|');
     let reNum = Math.floor(+ArrayedMsg[0].replace('/Re: ', '') / 10) + amariplus(ArrayedMsg, botid);
-    let ch;
-    if (ArrayedMsg[2] && message.mentions.channels.size != 0) {
-        let chs = message.mentions.channels.array();
-        let dchs = []
-        chs.forEach(function(chent){if(chent.id == ArrayedMsg[2].replace("<#", "").replace(">", "")){dchs.push(chent)}})
-        if(dchs.length==0){ch = message.channel}
-        ch = dchs[chs.length - 1];
-        //console.log(chs);
-    } else {
-        ch = message.channel;
+    let ch:Discord.TextChannel;
+    if (!(message.channel instanceof Discord.TextChannel)) {
+        message.channel.send("DMやニュースチャンネルでは利用できません");
+    }else {
+        if (ArrayedMsg[2] && message.mentions.channels.size != 0) {
+            let chs = message.mentions.channels;
+            let dchs:Array<Discord.TextChannel>;
+            chs.forEach(function(chent){if(chent.id == ArrayedMsg[2].replace("<#", "").replace(">", "")){dchs.push(chent)}})
+            if(dchs.length==0){ch = message.channel}
+            ch = dchs.pop();
+            //console.log(chs);
+        } else {
+            ch = message.channel;
+        }
     }
 
     message.channel.send('ｋ');
@@ -108,7 +113,7 @@ class EmojiCache{
         if(isanim){this.isanim=isanim}else{this.isanim=null}
     }
 
-    fromString(str){
+    fromString(str:string){
         if(Object.prototype.toString.call(str)=='[Object String]'){
             if(str.startsWith("<")==false||str.endsWith(">")==false){throw new SyntaxError(`絵文字の構文が正しくありません。絵文字は<>で囲まれている必要があります。\n問題が発生した文字列:${str}`)}
             if(str.split(":").length!=3){throw new SyntaxError(`絵文字の構文が正しくありません。絵文字には2つのコロンが存在するはずです。\n問題が発生した文字列:${str}`)}
@@ -127,7 +132,7 @@ class EmojiCache{
     }
 
     toString(){
-        let anim;
+        let anim:string;
         if(this.isanim){anim='a'}else{anim=''}
         return `<${anim}:${this.name}:${this.id}>`
     }
@@ -138,7 +143,7 @@ class EmojiCache{
 
     toJSONString(){
         this.chkthis();
-        let TorFstr;
+        let TorFstr:string;//<- That's meaning boolean
         if(this.isanim){TorFstr="true"}else{TorFstr="false"}
         return `{"name":"${this.name}","id":"${this.id}","isanim":"${TorFstr}"}`
     }
@@ -177,8 +182,10 @@ class EmojiStorage<EmojiCache> extends Array{
         return retstr;
     }
 
-    fromJSONArray(array){
-        if(typecheck(array)!='array'){throw new TypeError(`入力は配列でなければなりません。判定された型: ${typecheck(array)}`)}else{
+    fromJSONArray(array:Array<{name:string, id:string, isanim:boolean}>){
+        if(typecheck(array)!='array'){
+            throw new TypeError(`入力は配列でなければなりません。判定された型: ${typecheck(array)}`);
+        }else{
             array.forEach(consemo => {
                 this.push(new EmojiCache(consemo.name, consemo.id, consemo.isanim));
             },this);
@@ -255,4 +262,4 @@ class PermissionManager{
 }
 class PermissionUser{}
 class PermissionNode{}
-export {repeater, looper, amariplus, msgtrans, PinObserveChs, PinDestCh, pinnedmsgids, EmojiCache, EmojiStorage, GuildEmojiStorage, typecheck, repeatcom, WATIIN}
+export {repeater, looper, amariplus, msgtrans, pinnedmsgids, EmojiCache, EmojiStorage, GuildEmojiStorage, typecheck, repeatcom, WATIIN}

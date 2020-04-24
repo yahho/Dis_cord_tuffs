@@ -42,9 +42,7 @@ FS.readFile('emotes.json', 'utf-8', function (err, data) {
 //転送済みメッセージのIDのアレイを格納する奇妙な拡張子のファイルを読み込む
 distuff_util.pinnedmsgids=JSON.parse(FS.readFileSync("pinned.json","utf-8"));
 
-//📌転送用の配列達
-
-var pindestch = distuff_util.PinDestCh;
+//📌転送用の配列
 var pinTransmissionPairs:Array<PinTransPair> = [];
 
 //GetVidChLink用のストリング
@@ -257,10 +255,11 @@ client0.on('message', message => {
                 //メッセージ内のチャンネルメンションから転送先を決定する
                 let destch = message.mentions.channels.last();
                 message.channel.messages.fetchPinned()
-                    .then(msgsb => {
-                        let msgs = msgsb;
-                        for (let transrep = 1; transrep <= msgs.size; transrep++) {
-                            setTimeout(distuff_util.msgtrans, 3000 * transrep, destch, msgs, transrep);
+                    .then(msgs => {
+                        let delay:number = 0;
+                        for (let msg of msgs) {
+                            delay++;
+                            setTimeout(distuff_util.msgtrans, 3000 * delay, destch, msg);
                         }
                         message.channel.send('移行処理発行を完了しました。しばらくお待ち下さい...');
                     })
@@ -387,7 +386,7 @@ client0.on('message', message => {
             //対象のチャンネルかどうかを確認
             for (let targetPairs of pinTransmissionPairs.filter(pair => pair.collectCh == react.message.channel)){
                 //送り先のチャンネルの確認
-                distuff_util.msgtrans(targetPairs.destCh, [react.message], 1);
+                distuff_util.msgtrans(targetPairs.destCh, react.message);
             }
         }
     }
