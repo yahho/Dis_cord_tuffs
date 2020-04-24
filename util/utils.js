@@ -45,16 +45,18 @@ function msgtrans(destch, msgs, transrep) {
         //console.log(msgs[transrep-1].attachments.array()[0].url);
         if (msgs[transrep-1].attachments.array().length != 0) {
             //ファイルがくっついてればこっち
-            var atch=msgs[transrep-1].attachments.array()[0].url;
+            let atchs=msgs[transrep-1].attachments;
+            let atchobjs=[];
+            atchs.forEach(atch => {atchobjs.push(new Discord.MessageAttachment(atch.url))});
             //Attachmentにはファイルのパス、URL、またはバッファを投げる。
             //contentの後にAttachmentやRichEmbedをブチ込むと一緒に投稿してくれる。
-            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。\n【ジャンプURL】:\n内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`,new Discord.MessageAttachment(atch)).then(function(){
+            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。\n【ジャンプURL】: ${msgs[transrep - 1].url}\n内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`, atchobjs).then(function(){
                 pinnedmsgids.push(msgid);
                 FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
             })
         }else{
             //なんもくっついてなければこっち
-            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`).then(function(){
+            destch.send(`${msgs[transrep - 1].author}が${posteddate}に${msgs[transrep - 1].channel}で投稿した、ピン留め対象メッセージが転送されました。\n【ジャンプURL】: ${msgs[transrep - 1].url}\n内容は以下のとおりです。\n\n${msgs[transrep - 1].content}`).then(function(){
                 pinnedmsgids.push(msgid);
                 FS.writeFile("pinned.json",JSON.stringify(pinnedmsgids),function(err){if (err) throw err});
             })

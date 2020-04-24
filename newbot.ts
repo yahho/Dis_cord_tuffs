@@ -407,12 +407,6 @@ client1.on('message', message => {
             distuff_util.repeatcom(message, 1)
         }
     }
-    // Send the message to a designated channel on a server:
-    //const channel = member.guild.channels.find('name', 'member-log');
-    // Do nothing if the channel wasn't found on this server
-    //if (!channel) return;
-    // Send the message, mentioning the member
-    //channel.send(`Welcome to the server, ${member}`);
 });
 client2.on('message', message => {
     if (message.type == 'DEFAULT') {
@@ -420,12 +414,6 @@ client2.on('message', message => {
             distuff_util.repeatcom(message, 2)
         }
     }
-    // Send the message to a designated channel on a server:
-    //const channel = member.guild.channels.find('name', 'member-log');
-    // Do nothing if the channel wasn't found on this server
-    //if (!channel) return;
-    // Send the message, mentioning the member
-    //channel.send(`Welcome to the server, ${member}`);
 });
 client3.on('message', message => {
     if (message.type == 'DEFAULT') {
@@ -433,12 +421,6 @@ client3.on('message', message => {
             distuff_util.repeatcom(message, 3)
         }
     }
-    // Send the message to a designated channel on a server:
-    //const channel = member.guild.channels.find('name', 'member-log');
-    // Do nothing if the channel wasn't found on this server
-    //if (!channel) return;
-    // Send the message, mentioning the member
-    //channel.send(`Welcome to the server, ${member}`);
 });
 client4.on('message', message => {
     if (message.type == 'DEFAULT') {
@@ -446,12 +428,6 @@ client4.on('message', message => {
             distuff_util.repeatcom(message, 4)
         }
     }
-    // Send the message to a designated channel on a server:
-    //const channel = member.guild.channels.find('name', 'member-log');
-    // Do nothing if the channel wasn't found on this server
-    //if (!channel) return;
-    // Send the message, mentioning the member
-    //channel.send(`Welcome to the server, ${member}`);
 });
 client5.on('message', message => {
     if (message.type == 'DEFAULT') {
@@ -459,12 +435,6 @@ client5.on('message', message => {
             distuff_util.repeatcom(message, 5)
         }
     }
-    // Send the message to a designated channel on a server:
-    //const channel = member.guild.channels.find('name', 'member-log');
-    // Do nothing if the channel wasn't found on this server
-    //if (!channel) return;
-    // Send the message, mentioning the member
-    //channel.send(`Welcome to the server, ${member}`);
 });
 client6.on('message', message => {
     if (message.type == 'DEFAULT') {
@@ -472,12 +442,6 @@ client6.on('message', message => {
             distuff_util.repeatcom(message, 6)
         }
     }
-    // Send the message to a designated channel on a server:
-    //const channel = member.guild.channels.find('name', 'member-log');
-    // Do nothing if the channel wasn't found on this server
-    //if (!channel) return;
-    // Send the message, mentioning the member
-    //channel.send(`Welcome to the server, ${member}`);
 });
 client7.on('message', message => {
     if (message.type == 'DEFAULT') {
@@ -485,12 +449,6 @@ client7.on('message', message => {
             distuff_util.repeatcom(message, 7)
         }
     }
-    // Send the message to a designated channel on a server:
-    //const channel = member.guild.channels.find('name', 'member-log');
-    // Do nothing if the channel wasn't found on this server
-    //if (!channel) return;
-    // Send the message, mentioning the member
-    //channel.send(`Welcome to the server, ${member}`);
 });
 client8.on('message', message => {
     if (message.type == 'DEFAULT') {
@@ -498,12 +456,6 @@ client8.on('message', message => {
             distuff_util.repeatcom(message, 8)
         }
     }
-    // Send the message to a designated channel on a server:
-    //const channel = member.guild.channels.find('name', 'member-log');
-    // Do nothing if the channel wasn't found on this server
-    //if (!channel) return;
-    // Send the message, mentioning the member
-    //channel.send(`Welcome to the server, ${member}`);
 });
 client9.on('message', message => {
     if (message.type == 'DEFAULT') {
@@ -511,12 +463,6 @@ client9.on('message', message => {
             distuff_util.repeatcom(message, 9)
         }
     }
-    // Send the message to a designated channel on a server:
-    //const channel = member.guild.channels.find('name', 'member-log');
-    // Do nothing if the channel wasn't found on this server
-    //if (!channel) return;
-    // Send the message, mentioning the member
-    //channel.send(`Welcome to the server, ${member}`);
 });
 
 // Log our bot in
