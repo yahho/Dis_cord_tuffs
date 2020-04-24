@@ -64,9 +64,6 @@ function msgtrans(destch:Discord.TextChannel, msg:Discord.Message) {
         }
     }
 }
-//📌転送用の配列達
-var PinObserveChs = [];
-var PinDestCh = [];
 
 function repeatcom(message:Discord.Message, botid:number){
     let ArrayedMsg = message.content.split(' ->|');
@@ -108,7 +105,9 @@ class EmojiCache{
             this.id = nameOrEmoji.id;
             this.isanim = nameOrEmoji.animated;
             return this;
-        }else{this.name=name}
+        }else if (typeof nameOrEmoji == 'string'){
+            this.name=nameOrEmoji
+        }else{this.name=null}
         if(id){this.id=id}else{this.isanim=null}
         if(isanim){this.isanim=isanim}else{this.isanim=null}
     }
