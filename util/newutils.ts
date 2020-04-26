@@ -106,7 +106,7 @@ class EmojiCache{
             this.isanim = nameOrEmoji.animated;
             return this;
         }else if (typeof nameOrEmoji == 'string'){
-            this.name=nameOrEmoji
+            this.name=nameOrEmoji;
         }else{this.name=null}
         if(id){this.id=id}else{this.isanim=null}
         if(isanim){this.isanim=isanim}else{this.isanim=null}

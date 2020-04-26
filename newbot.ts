@@ -268,7 +268,8 @@ client0.on('message', message => {
                     //perm:command.pin.observeandcopy.channel
                     //TODO:クライアントのイベントから拾うように書き直す
                     if (message.channel instanceof Discord.DMChannel||message.channel instanceof Discord.NewsChannel) return;
-                    let transdestch = message.mentions.channels.last();
+                    let transdestch:Discord.TextChannel|undefined = message.mentions.channels.last();
+                    if (transdestch === undefined){transdestch = message.channel;}
                     pinTransmissionPairs.push(new PinTransPair(transdestch, message.channel));
                     
                 }else if (ArrayedCmd[1].indexOf('Guild')==0) {
